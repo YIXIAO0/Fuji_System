@@ -1,0 +1,88 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Entry</title>
+    <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
+    <link rel="stylesheet" href="style/left-panel.css">
+    <link rel="stylesheet" href="style/main-order-entry-page.css">
+    <link rel="stylesheet" href="style/copy-right.css">
+    <link rel="stylesheet" href="style/products-table.css">
+</head>
+
+<body>
+    <div class="contents">
+        <div class="left-panel">
+            <div class="logo-section">
+                <img src="./image/Fuji_logo.png" alt="Company Logo" class="logo">
+            </div>
+                <div class="panel">
+                <a href="">
+                    <button class="panel-button">Home</button>
+                </a> 
+                <a href="OrderEntryPage.html">
+                    <button class="panel-button active">Order Entry</button>
+                </a>
+                <a href="MasterOrderboardPage.html">
+                    <button class="panel-button">Master Board</button>
+                </a>
+                <a href="ProductTablePage.html">
+                    <button class="panel-button">Product Info</button>
+                </a> 
+                <a href="CustomerTablePage.html">
+                    <button class="panel-button">Customer Info</button>
+                </a>
+                <a href="">
+                    <button class="panel-button">Promotion</button>
+                </a>  
+            </div>         
+        </div>
+        <div class="main-order-entry-page">
+            <div class="header-order-entry-page">
+                <h1 class="page-title">Order Entry</h1>
+                <div class="top-buttons">
+                    <button class="icon-button"><img src="./image/notification.png" alt="Notifications"></button>
+                    <button class="icon-button"><img src="./image/profile-user.png" alt="Profile"></button>
+                </div>
+            </div>
+            <div class="search-order-entry-page">
+                <input class="search-bar" type="text" placeholder="Search Customer">
+                <button class="search-button">
+                    <img class="search-icon" src="./image/search.png">
+                </button>
+
+                <input class="date-selector" type="date" name="order_day" />
+
+                <div class="option-toggle">
+                    <button class="toggle-button" id="channel_0" onclick="toggleButton('channel_0')">Phone</button>
+                    <button class="toggle-button" id="channel_1" onclick="toggleButton('channel_1')">E-mail</button>
+                    <button class="toggle-button" id="channel_2" onclick="toggleButton('channel_2')">Fax</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="copy-right">
+        © 2023 Yi & Winston. All rights reserved.
+    </div>
+
+    <script src="renderer.js"></script>
+    <script>
+        // JavaScript function to handle the button click and toggle class
+        function toggleButton(activeButtonId) {
+            var buttons = document.querySelectorAll('button');
+            // Loop through each button
+            buttons.forEach(function(button) {
+                // Check if the button is the one being clicked
+                if (button.id === activeButtonId) {
+                    // Toggle the class for the clicked button
+                    button.classList.add('active');
+                } else {
+                    // Remove the class for other buttons
+                    button.classList.remove('active');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

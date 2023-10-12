@@ -1,0 +1,120 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Information</title>
+    <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
+    <link rel="stylesheet" href="style/left-panel.css">
+    <link rel="stylesheet" href="style/main-customer-table-page.css">
+    <link rel="stylesheet" href="style/copy-right.css">
+    <link rel="stylesheet" href="style/customer-table.css">
+</head>
+
+<body>
+    <div class="contents">
+        <div class="left-panel">
+            <div class="logo-section">
+                <img src="./image/Fuji_logo.png" alt="Company Logo" class="logo">
+            </div>
+                <div class="panel">
+                <a href="">
+                    <button class="panel-button">Home</button>
+                </a> 
+                <a href="OrderEntryPage.html">
+                    <button class="panel-button">Order Entry</button>
+                </a>
+                <a href="MasterOrderboardPage.html">
+                    <button class="panel-button">Master Board</button>
+                </a>
+                <a href="ProductTablePage.html">
+                    <button class="panel-button">Product Info</button>
+                </a> 
+                <a href="CustomerTablePage.html">
+                    <button class="panel-button active">Customer Info</button>
+                </a>
+                <a href="">
+                    <button class="panel-button">Promotion</button>
+                </a>           
+            </div>
+        </div>
+        <div class="main-customer-table-page">
+            <div class="header-customer-table-page">
+                <h1 class="page-title">Customer Information</h1>
+                <div class="top-buttons">
+                    <button class="icon-button"><img src="./image/notification.png" alt="Notifications"></button>
+                    <button class="icon-button"><img src="./image/profile-user.png" alt="Profile"></button>
+                </div>
+            </div>
+            <div class="search-customer-table-page">
+                <input class="search-bar" type="text" placeholder="Search Customer">
+                <button class="search-button">
+                    <img class="search-icon" src="./image/search.png">
+                </button>
+            </div>
+            <div class="content-customer-table-page">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Business Name</th>
+                            <th>Address</th>
+                            <th>Industry</th>
+                            <th>Category</th>
+                            <th>Phone</th>
+                            <th>Fax</th>
+                            <th>E-mail</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Alphabet</td>
+                            <td>1600 Amphitheatre Parkway, Mountain View, CA 94043</td>
+                            <td>Technology</td>
+                            <td>Retail</td>
+                            <td>6502530000</td>
+                            <td>6502530000</td>
+                            <td>contact@alphabet.com</td>
+                            <td>
+                                <button class="show-detail-button" id="company_0" onclick="navigateWithInfo(id)">
+                                </button>
+                            </td>
+                        </tr> 
+                        <tr>
+                            <td>Amazon</td>
+                            <td>410 Terry Ave N, Seattle, WA 98109</td>
+                            <td>Consumer Discretionary</td>
+                            <td>Retail</td>
+                            <td>8882804331</td>
+                            <td>8882804331</td>
+                            <td>contact@amazon.com</td>
+                            <td>
+                                <button class="show-detail-button" id="company_1" onclick="navigateWithInfo(id)">
+                                </button>
+                            </td>
+                        </tr>                                
+                        <!-- Add more rows as needed -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="copy-right">
+        © 2023 Yi & Winston. All rights reserved.
+    </div>
+    <script src="renderer.js"></script>
+    <script>
+
+        function navigateWithInfo(companyID) {
+            // Information to be passed
+            const infoData = companyID
+
+            // Create the URL for the new page with the button ID as a query parameter
+            const newPageUrl = `CustomerDetailPage.html?id=${encodeURIComponent(companyID)}`;
+
+            // Navigate to the new HTML page with information
+            window.location.href = newPageUrl;
+        }
+
+    </script>
+</body>
+</html>

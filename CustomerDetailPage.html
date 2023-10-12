@@ -1,0 +1,38 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Information</title>
+    <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
+    <link rel="stylesheet" href="style/left-panel.css">
+    <link rel="stylesheet" href="style/main-order-entry-page.css">
+    <link rel="stylesheet" href="style/copy-right.css">
+    <link rel="stylesheet" href="style/products-table.css">
+</head>
+
+<body>
+
+    <a href="CustomerTablePage.html">
+        <button >Return to Customer Table</button>
+    </a>
+    <p id="infoDisplay"></p>
+
+<script>
+    // Function to extract and display information from the URL
+    function displayInfoFromUrl() {
+        // Get the query string from the URL
+        const queryString = window.location.search.substring(1);
+        // Parse the query string into an object
+        const params = new URLSearchParams(queryString);
+        // Extract information from the object
+        const buttonId = params.get('id');
+        // Display information on the page
+        document.getElementById('infoDisplay').textContent = `Company ID: ${buttonId}`;
+    }
+
+    // Call the function to display information when the page loads
+    displayInfoFromUrl();
+</script>
+
+</body>
+</html>

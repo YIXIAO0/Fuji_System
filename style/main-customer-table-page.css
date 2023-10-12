@@ -1,0 +1,106 @@
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    margin: 0;
+    font-family: 'Roboto';
+    overflow: hidden; /* prevent any unwanted overflow */
+    white-space: nowrap;
+}
+
+.contents {
+    background-color: #F5F5F5;
+    width: 100%; /* take the full width */
+    display: flex;
+    flex-direction: row;
+    flex: 9.7; /* 97% */
+}
+
+.main-customer-table-page {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.header-customer-table-page {
+    display: flex;
+    justify-content: space-between; /* Aligns the title to the left and the buttons to the right */
+    align-items: center; /* Vertically center-aligns the title and buttons */
+    width: 100%;
+    height: 30px;
+    /*padding-left: 40px;*/
+    padding-top: 10px;
+    padding-bottom: 10px;
+    /* box-shadow: 0 2px 4px rgba(0,0,0,0.1); Optional shadow for a lifted appearance */
+    background-color: #dddad9; /* Background color for the top section */;
+}
+
+.page-title {
+    margin: 0; /* Remove default margin */
+    padding-left: 40px;
+    font-family: 'Roboto';
+    font-size: 32px;
+    font-weight: 700;
+    /* Any other specific styles you want for the title */
+}
+
+.top-buttons {
+    display: flex;
+    gap: 10px; /* Space between the buttons */
+    padding-right: 20px;
+}
+
+.icon-button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 5px; /* Space around the image */
+}
+
+.icon-button img {
+    width: 24px; /* Set a size for the images */
+    height: 24px;
+}
+
+.icon-button:focus {
+    outline: none;
+}
+
+.search-customer-table-page {
+    display: flex;
+    flex-direction: row;
+    height: 40px;
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+
+.search-bar {
+    height: 40px;
+    width: 40vh;
+    background-color: #F5F5F5;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #DDDAD9;
+    margin-left: 40px;
+}
+
+.search-customer-table-page img {
+    display: block;
+    margin-top: auto;
+    margin-bottom: auto;
+    width: 32px;
+}
+
+.search-button {
+    height: 40px;
+    width: 44px;
+    background-color: #E9E7E6;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #DDDAD9;
+    margin-left: -1px; 
+}
+
+.search-bar::placeholder {
+    font-size: 22px;
+}

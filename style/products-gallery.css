@@ -1,0 +1,60 @@
+.content-product-gallery-page {
+    display: flex;
+    /* overflow-y: scroll; */
+    width: 80%;
+    padding-top: 30px;
+    padding-left: 80px;
+    flex-direction: column;
+    gap: 20px; /* Adds space between the rows */
+}
+
+.product-row {
+    display: flex;
+    gap: 40px; /* Adds space between individual products */
+    padding-bottom: 40px;
+}
+
+.product {
+    display: flex;
+    width: 180px;
+    height: 220px;
+    flex-direction: column;
+    align-items: center; 
+    gap: 10px; 
+    border: none; /* Remove default button border */
+    background-color: transparent; /* Remove default button background */
+    cursor: pointer; /* Indicate clickable */
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+    padding: 10px; /* Add some padding around the content */
+}
+
+.product:hover {
+    background-color: #f7f7f7; /* Light background on hover */
+}
+
+.product-image {
+    width: 150px; 
+    height: 150px; 
+    object-fit: cover; 
+    border-radius: 8px; /* Optional rounded corners */
+}
+
+.product-name, .product-price {
+    text-align: center;
+    margin: 0; /* Remove default margin */
+}
+
+.product:focus {
+    outline: none; /* Remove default focus outline */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); /* Add a subtle shadow for focus indication */
+    border-radius: 4px;
+}
+
+
+.add-product-image {
+    padding-top: 20%;
+    width: 80px; 
+    height: 80px; 
+    object-fit: cover; 
+    border-radius: 8px; /* Optional rounded corners */
+}

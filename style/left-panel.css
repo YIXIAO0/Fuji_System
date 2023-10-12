@@ -1,0 +1,82 @@
+.left-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Horizontally center the contents */
+    width: 200px; /* Fixed width for the left section */
+    height: 100%;
+    background-color: #E9E7E6;
+    border-right: 2px solid #D6D4D3;
+    padding: 0px;
+    box-sizing: border-box;
+}
+
+.panel {
+    background-color: #E9E7E6;
+    padding: 0px;
+    width: 100%; /* Take full width of the parent container */
+}
+
+.panel-button {
+    display: block;
+    width: 100%; /* 100% minus left and right padding */
+    height: 40px;
+    margin: 0px 0;
+    padding-left: 40px; /* Check Later: 40px or 20px*/
+    background-color: #E9E7E6;
+    border-bottom: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-radius: 0px;
+    cursor: pointer;
+    text-align: left; /* Align the text to the left of the button */
+    transition: background-color 0.3s;
+    font-size: 20px;
+    font-family: 'Roboto';
+    font-weight: bold;
+}
+
+.panel-button:hover {
+    background-color: #dddad9;
+    color: #8bbf56;
+}
+
+.panel-button:focus {
+    outline: none;
+    color: #8bbf56;
+}
+
+.panel-button.active{
+    background-color: #DDDAD9;
+}
+
+.logo {
+    width: 60%; /* Adjust the width as needed */
+    max-width: 150px;
+    display: block;
+    margin-top: 5px; /* Ensure the logo is at the very top */
+    margin-bottom: 20px; /* Spacing between logo and panel */
+}
+
+.logo-section {
+    display: flex;
+    justify-content: center; 
+    width: 100%;
+    background-color: #F5F5F5;
+}
+
+/* @media (max-width: 900px) {
+    .left-panel {
+        display: none;
+    }
+}
+
+.open-icon {
+    display: none; 
+}
+
+@media (max-width: 900px) {
+    .open-icon {
+        display: block; 
+    }
+} */

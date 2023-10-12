@@ -1,0 +1,12 @@
+.copy-right {
+    flex: 0.03; /* 3% */
+    display: flex; /* turn it into a flex container */
+    padding-left: 6%;
+    align-items: center; /* center content vertically */
+    background-color: #F5F5F5;
+    width: 100%; /* take the full width */
+    text-align: center; /* just in case there's a line break, this will keep text centered */
+    font-family: 'Roboto';
+    font-size: 14px;
+    font-weight: light;
+}

@@ -1,0 +1,45 @@
+.content-product-table-page {
+    display: flex;
+    margin-top: 40px;
+    margin-left: 80px;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #D9D7D6;
+    padding: 8px;
+    text-align: left;
+    white-space: nowrap;
+    font-style: 'Roboto';
+    font-size: 16px;
+}
+
+th {
+    background-color: #F5F5F5;
+    font-weight: bold;
+}
+
+.table-container {
+    margin-left:250px;
+    max-height: 400px;
+    max-width: 60%;
+    overflow-y:scroll;
+    overflow-x:auto;
+}
+
+#addButton {
+    display: block;
+    margin: auto;
+    padding: 10px 20px;
+    border: none;
+    background-color: #F5F5F5; /* Change color to your preference */
+    cursor: pointer;
+}
+
+#addIcon {
+    width: 10px;  /* Or whatever size you desire */
+    height: auto; /* Maintain aspect ratio */
+}

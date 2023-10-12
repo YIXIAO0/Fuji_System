@@ -1,0 +1,79 @@
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    margin: 0;
+    font-family: 'Roboto';
+    overflow: hidden; /* prevent any unwanted overflow */
+    white-space: nowrap;
+}
+
+.header {
+    background-color: #DDDAD9;
+    width: 100%; /* take the full width */
+    display: flex;
+    flex-direction: row;
+    height: 50px;
+}
+
+.main-product-details-section {
+    background-color: #f5f5f5;
+    width: 100%; /* take the full width */
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+}
+
+.goBackButton {
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 5px; /* Space around the image */
+}
+
+.goBackButton img {
+    width: 30px; /* Set a size for the images */
+    height: 30px;
+}
+
+.goBackButton:hover {
+    background-color: #d0d0d0;  /* Slightly darker background on hover for feedback */
+}
+
+#productNameDisplay {
+    margin: 0; /* Remove default margin */
+    padding-left: 20px;
+    padding-top: 6px;
+    font-family: 'Roboto';
+    font-size: 32px;
+    font-weight: 700;
+    /* Any other specific styles you want for the title */
+}
+
+
+.product-information-section{
+    display: flex;
+    flex: 50%;
+    background-color: blanchedalmond;
+    flex-direction: row;
+}
+
+.product-image-section {
+    display: flex;
+    flex: 50%;
+    background-color: aqua;
+}
+
+.product-details-section {
+    display: flex;
+    flex: 50%;
+    background-color: white;
+}
+
+.product-analysis-section{
+    display: flex;
+    flex: 50%;
+    background-color: rgb(34, 33, 31);
+    flex-direction: column;
+}
+

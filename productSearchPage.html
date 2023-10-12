@@ -1,0 +1,87 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src *; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;"> -->
+    <title>Product Search</title>
+    <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
+    <link rel="stylesheet" href="style/left-panel.css">
+    <link rel="stylesheet" href="style/main-product-search-page.css">
+    <link rel="stylesheet" href="style/copy-right.css">
+    <link rel="stylesheet" href="style/products-table.css">
+    <link rel="stylesheet" href="style/products-gallery.css">
+</head>
+<body>
+    <div class="contents">
+        <div class="left-panel">
+            <div class="logo-section">
+                <img src="./image/Fuji_logo.png" alt="Company Logo" class="logo">
+            </div>
+            <div class="panel">
+            <button class="panel-button">Home</button>
+            <button class="panel-button">Order Entry</button>
+            <button class="panel-button">Master Board</button>
+            <button class="panel-button active">Product Info</button>
+            <button class="panel-button">Customer Info</button>
+            <button class="panel-button">Promotion</button>
+            </div>
+        </div>
+        
+        <div class="main-product-table-page">
+            <div class="header-product-table-page">
+                <!-- <div class="open-icon">
+                    <img src="./image/menu.png" alt="Open Left Panel">
+                </div> -->
+                <h1 class="page-title">Product Information</h1>
+                <div class="top-buttons">
+                    <button class="icon-button"><img src="./image/notification.png" alt="Notifications"></button>
+                    <button class="icon-button"><img src="./image/profile-user.png" alt="Profile"></button>
+                </div>
+            </div>
+            <div class="search-product-table-page">
+                <div class="search-bar">
+                    <input type="search" id="productSearchBar" class="search-input" placeholder="Search Product">
+                    <img src="./image/search.png" alt="Search Icon" class="search-icon">
+                    <button class="product-search-button">Search</button>
+                </div>
+                <div class="option-toggle">
+                    <button class="toggle-button active" id="tableToggle">Table</button>
+                    <button class="toggle-button" id="galleryToggle">Gallery</button></div>
+            </div>
+            <div class="content-product-table-page">
+                <table>
+                    <thead>
+                      <tr>
+                        <th>productID</th>
+                        <th>productName</th>
+                        <th>productUnitPrice</th>
+                        <th>productIsAvailable</th>
+                        <th>productShelfLife</th>
+                        <th>productCategory</th>
+                        <th>Details</th>
+                      </tr>
+                    </thead>
+                    <tbody id="productsTableBody">
+                      <!-- Data will be appended here -->
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="7">
+                                <button id="addButton"><img src="image/plus.png" alt="Add" id="addIcon"></button>
+                            </td>
+                        </tr>
+                    </tfoot>
+                  </table>
+            </div>
+            <div class="content-product-gallery-page" style="display: none;"></div>
+        </div>
+    </div>
+
+    <div class="copy-right">
+        © 2023 Yi & Winston. All rights reserved.
+    </div>
+    <script src="./renderer.js"></script>
+    <!-- <script src="./uiToggles.js"></script> -->
+</body>
+</html>

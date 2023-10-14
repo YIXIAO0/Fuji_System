@@ -1,0 +1,78 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src *; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;"> -->
+    <title>Product Search</title>
+    <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
+    <link rel="stylesheet" href="style/left-panel.css">
+    <link rel="stylesheet" href="style/copy-right.css">
+    <link rel="stylesheet" href="style/main-customer-search-page.css">
+</head>
+<body>
+    <div class="contents">
+        <div class="left-panel">
+            <div class="logo-section">
+                <img src="./image/Fuji_logo.png" alt="Company Logo" class="logo">
+            </div>
+            <div class="panel">
+            <button class="panel-button">Home</button>
+            <button class="panel-button">Order Entry</button>
+            <button class="panel-button">Master Board</button>
+            <button class="panel-button">Product Info</button>
+            <button class="panel-button active">Customer Info</button>
+            <button class="panel-button">Promotion</button>
+            </div>
+        </div>
+        
+        <div class="main-customer-table-page">
+            <div class="header-customer-table-page">
+                <h1 class="page-title">Customer Information</h1>
+                <div class="top-buttons">
+                    <button class="icon-button"><img src="./image/notification.png" alt="Notifications"></button>
+                    <button class="icon-button"><img src="./image/profile-user.png" alt="Profile"></button>
+                </div>
+            </div>
+            <div class="search-customer-table-page">
+                <div class="search-bar">
+                    <input type="search" id="customerSearchBar" class="search-input" placeholder="Search Customer">
+                    <img src="./image/search.png" alt="Search Icon" class="search-icon">
+                    <button class="customer-search-button">Search</button>
+                </div>
+            </div>
+            <div class="content-customer-table-page">
+                <table>
+                    <thead>
+                      <tr>
+                        <th>Customer ID</th>
+                        <th>Business Name</th>
+                        <th>Industry</th>
+                        <th>Category</th>
+                        <th>Phone</th>
+                        <th>Fax</th>
+                        <th>E-mail</th>
+                        <th>Details</th>
+                      </tr>
+                    </thead>
+                    <tbody id="customersTableBody">
+                      <!-- Data will be appended here -->
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="8">
+                                <button id="addButton"><img src="image/plus.png" alt="Add" id="addIcon"></button>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="copy-right">
+        © 2023 Yi & Winston. All rights reserved.
+    </div>
+    <script src="./renderer.js"></script>
+    <!-- <script src="./uiToggles.js"></script> -->
+</body>
+</html>

@@ -9,13 +9,15 @@
   },
   "author": "Yi & Winston",
   "license": "ISC",
-  "devDependencies": {
-    "electron": "^26.3.0"
-  },
   "dependencies": {
+    "chartjs-adapter-date-fns": "^3.0.0",
+    "date-fns": "^2.30.0",
     "dotenv": "^16.3.1",
+    "electron": "^27.0.0",
     "electron-reload": "^2.0.0-alpha.1",
     "mysql": "^2.18.1",
-    "mysql2": "^3.6.1"
+    "mysql2": "^3.6.1",
+    "plotly.js": "^2.26.2",
+    "plotly.js-dist": "^2.26.2"
   }
 }

@@ -1,5 +1,6 @@
 function renderProductGallery(products) {
     const galleryContainer = document.querySelector('.content-product-gallery-page');
+    if (!galleryContainer) return;
     galleryContainer.innerHTML = ''; // Clear existing content
     let productRow = document.createElement('div');
     productRow.classList.add('product-row');

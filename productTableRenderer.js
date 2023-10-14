@@ -1,6 +1,6 @@
 function renderProductTable(products) {
     const tableBody = document.getElementById('productsTableBody');
-
+    if (!tableBody) return;
     tableBody.innerHTML = '';
 
     products.forEach(product => {

@@ -1,8 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
-const path = require('path');
-const connection = require('./database');
-const searchHandler = require('./searchHandler');  // If the main process has some logic for handling searches
-
+const connection = require('./database'); // Connect the database
+const productSearchHandler = require('./productSearchHandler'); // Product Search Handler
+const customerSearchHandler = require('./customerSearchHandler'); // Customer Search Handler
 let mainWindow;
 
 app.on('ready', () => {
@@ -12,7 +11,7 @@ app.on('ready', () => {
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
-            enableRemoteModule: false
+            enableRemoteModule: true
         }
     });
 
@@ -34,9 +33,13 @@ app.on('ready', () => {
     });
 });
 
-// Listen for the search request from the renderer
+ipcMain.on('navigate', (event, page) => {
+    mainWindow.loadFile(page);
+});
+
+// Listen for the product search request from the renderer
 ipcMain.on('perform-product-search', (event, searchQuery) => {
-    searchHandler.handleSearch(searchQuery, connection)
+    productSearchHandler.handleSearch(searchQuery, connection)
     .then(results => {
         mainWindow.webContents.send('products-data', results);
     })
@@ -69,9 +72,113 @@ ipcMain.on('open-product-details', (event, productData) => {
     mainWindow.loadFile('productDetails.html');
 });
 
+
+// Listen for the customer search request from the renderer
+ipcMain.on('perform-customer-search', (event, searchQuery) => {
+    customerSearchHandler.handleSearch(searchQuery, connection)
+    .then(results => {
+        mainWindow.webContents.send('customers-data', results);
+    })
+    .catch(error => {
+        console.error('Error fetching customers:', error);
+        mainWindow.webContents.send('customers-data-error', error.message);
+    });
+});
+
+ipcMain.on('request-all-customers', (event) => {
+    connection.query('SELECT * FROM Customers', (err, results) => {
+        if (err) {
+            mainWindow.webContents.send('customers-data-error', err.message);
+        } else {
+            mainWindow.webContents.send('customers-data', results);
+        }
+    });
+});
+
 ipcMain.on('navigate-back-to-search', () => {
     mainWindow.loadFile('productSearchPage.html');
 });
+
+ipcMain.on('fetch-sales-data', (event, data) => {
+    const { productID, fromDate, toDate } = data;
+
+    const query = `
+    SELECT o.orderDate, SUM(op.productQuantity) AS totalSales
+    FROM OrderProducts AS op
+    JOIN Orders As o ON op.orderID = o.orderID
+    WHERE op.productID = ? 
+    AND o.orderDate BETWEEN ? AND ?
+    GROUP BY o.orderDate
+    ORDER BY o.orderDate;
+    `;
+
+    connection.query(query, [productID, fromDate, toDate], (err, rows) => {
+        if (err) {
+            event.reply('fetch-sales-data-error', err.message);
+        } else {
+            event.reply('fetch-sales-data-success', rows);
+        }
+    });
+});
+
+ipcMain.on('fetch-customer-distribution-data', (event, data) => {
+    const { productID, fromDate, toDate } = data;
+
+    const query = `
+    SELECT c.customerCategory_0 AS category, SUM(op.productQuantity) AS totalSales
+    FROM OrderProducts AS op
+    JOIN Orders AS o ON op.orderID = o.orderID
+    JOIN Customers AS c ON o.customerID = c.customerID
+    WHERE op.productID = ?  
+    AND o.orderDate BETWEEN ? AND ?
+    GROUP BY c.customerCategory_0
+    ORDER BY totalSales DESC;
+    `;
+
+    connection.query(query, [productID, fromDate, toDate], (err, rows) => {
+        if (err) {
+            event.reply('fetch-customer-distribution-data-error', err.message);
+        } else {
+            event.reply('fetch-customer-distribution-data-success', rows);
+        }
+    });
+});
+
+
+ipcMain.on('fetch-product-sales-history-data', (event, data) => {
+    const { productID, fromDate, toDate } = data;
+
+    const query = `
+    SELECT 
+        o.orderID, 
+        o.orderDate,
+        o.customerID,
+        c.customerName,
+        op.productQuantity,
+        (op.productQuantity * p.productUnitPrice) AS totalPrice
+    FROM 
+        Orders o
+    JOIN 
+        OrderProducts op ON o.orderID = op.orderID
+    JOIN 
+        Products p ON op.productID = p.productID
+    JOIN 
+        Customers c ON o.customerID = c.customerID
+    WHERE 
+        p.productID = ?
+    AND
+        o.orderDate BETWEEN ? AND ?
+    `;
+
+    connection.query(query, [productID, fromDate, toDate], (err, rows) => {
+        if (err) {
+            event.reply('fetch-product-sales-history-data-error', err.message);
+        } else {
+            event.reply('fetch-product-sales-history-data-success', rows);
+        }
+    });
+});
+
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {

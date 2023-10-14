@@ -1,0 +1,171 @@
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    margin: 0;
+    font-family: 'Roboto';
+    overflow: hidden; /* prevent any unwanted overflow */
+    white-space: nowrap;
+}
+
+.contents {
+    background-color: #F5F5F5;
+    width: 100%; /* take the full width */
+    display: flex;
+    flex-direction: row;
+    flex: 9.7; /* 97% */
+}
+
+.main-customer-table-page {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+
+.header-customer-table-page {
+    display: flex;
+    justify-content: space-between; /* Aligns the title to the left and the buttons to the right */
+    align-items: center; /* Vertically center-aligns the title and buttons */
+    width: 100%;
+    height: 30px;
+    padding-left: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    /* box-shadow: 0 2px 4px rgba(0,0,0,0.1); Optional shadow for a lifted appearance */
+    background-color: #dddad9; /* Background color for the top section */;
+}
+
+.page-title {
+    margin: 0; /* Remove default margin */
+    padding-left: 20px;
+    font-family: 'Roboto';
+    font-size: 32px;
+    font-weight: 700;
+    /* Any other specific styles you want for the title */
+}
+
+.top-buttons {
+    display: flex;
+    gap: 10px; /* Space between the buttons */
+    padding-right: 20px;
+}
+
+.icon-button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 5px; /* Space around the image */
+}
+
+.icon-button img {
+    width: 24px; /* Set a size for the images */
+    height: 24px;
+}
+
+.icon-button:focus {
+    outline: none;
+}
+
+.search-customer-table-page {
+    display: flex;  /* To lay out its children (search-container and selection-toggle) horizontally */
+    
+    align-items: center;
+    height: 40px;
+    margin-top: 40px;
+    margin-bottom: 40px;
+    justify-content: space-between; /* Gives equal space between the two child divs */
+    /* flex-direction: column; */
+}
+
+.search-input {
+    width: 36%;  
+    flex: 1; 
+    padding: 10px;
+    padding-left: 30px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    font-size: 18px;
+    margin-left: 40px;
+    margin-top: 50px;
+}
+
+.search-bar {
+    position: relative;  /* Establishes a positioning context for the search icon */
+    flex-grow: 1;        /* Allows the wrapper to grow and take up available space */
+    margin-right: 10px;  /* Adds some spacing between the input and the search button */
+    margin-left: 40px;
+}
+
+.customer-search-button {
+    padding: 8px 16px;
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.customer-search-button:hover {
+    background-color: #0056b3;
+}
+
+.search-icon {
+    position: absolute;  /* Absolute position relative to the search-wrapper */
+    left: 46px;          /* Position from the left of the search-wrapper */
+    top: 76%;            /* Centers the icon vertically */
+    transform: translateY(-50%);  /* Adjusts for the height of the icon to perfectly center it */
+    width: 20px;         /* Width of the icon, adjust as needed */
+    height: 20px;        /* Height of the icon, adjust as needed */
+    pointer-events: none;  /* Makes sure the icon doesn't interfere with input interactions */
+}
+
+
+.search-container {
+    display: flex;
+    flex: 1;  /* Takes up all available space, pushing the selection-toggle to the right */
+    align-items: center;
+}
+
+.content-customer-table-page {
+    display: flex;
+    width: 85%;
+    overflow-x: scroll;
+    overflow-y: auto;
+    margin-top: 40px;
+    margin-left: 80px;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #D9D7D6;
+    padding: 8px;
+    text-align: left;
+    white-space: nowrap;
+    font-style: 'Roboto';
+    font-size: 16px;
+}
+
+th {
+    background-color: #F5F5F5;
+    font-weight: bold;
+}
+
+
+#addButton {
+    display: block;
+    margin: auto;
+    padding: 10px 20px;
+    border: none;
+    background-color: #F5F5F5; /* Change color to your preference */
+    cursor: pointer;
+}
+
+#addIcon {
+    width: 10px;  /* Or whatever size you desire */
+    height: auto; /* Maintain aspect ratio */
+}

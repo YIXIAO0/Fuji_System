@@ -24,19 +24,19 @@ body {
     flex-direction: row;
 }
 
-.goBackButton {
+.goBackProductSearchButton {
     border: none;
     background: none;
     cursor: pointer;
     padding: 5px; /* Space around the image */
 }
 
-.goBackButton img {
+.goBackProductSearchButton img {
     width: 30px; /* Set a size for the images */
     height: 30px;
 }
 
-.goBackButton:hover {
+.goBackProductSearchButton:hover {
     background-color: #d0d0d0;  /* Slightly darker background on hover for feedback */
 }
 
@@ -141,13 +141,18 @@ body {
 
 #salesAnalysisContent {
     width: 100%;     
-    height: 600px;   
+    max-height: 600px;   
     overflow-y: auto;  
 }
 
 #pieChart {
     margin-left: 20px;
     font-weight: 200px;
+}
+
+#orderHistoryContent {
+    max-height: 600px; 
+    overflow-y: auto;
 }
 
 table {

@@ -2,6 +2,9 @@
     display: flex;
     margin-top: 40px;
     margin-left: 80px;
+    overflow-y: auto;
+    overflow-x: scroll;
+    max-width: 1200px;
 }
 
 table {
@@ -11,9 +14,10 @@ table {
 th, td {
     border: 1px solid #D9D7D6;
     padding: 8px;
+    padding-right: 60px;
     text-align: left;
     white-space: nowrap;
-    font-style: 'Roboto';
+    font-family: 'Roboto', sans-serif;
     font-size: 16px;
 }
 
@@ -23,7 +27,7 @@ th {
 }
 
 .table-container {
-    margin-left:250px;
+    margin-left:20px;
     max-height: 400px;
     max-width: 60%;
     overflow-y:scroll;
@@ -42,4 +46,24 @@ th {
 #addIcon {
     width: 10px;  /* Or whatever size you desire */
     height: auto; /* Maintain aspect ratio */
+}
+
+.available-button, .unavailable-button {
+    border: none;
+    padding: 5px 10px;
+    width: 120px;
+    height: 30px;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: not-allowed; /* This makes the button unclickable */
+}
+
+.available-button {
+    background-color: rgba(22, 192, 152, 0.38);
+    color: #00B087;
+}
+
+.unavailable-button {
+    background-color: #FFC5C5;
+    color: #DF0404;
 }

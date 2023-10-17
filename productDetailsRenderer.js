@@ -1,5 +1,4 @@
 const { ipcRenderer} = require('electron');
-const connection = require('./database.js');
 const Plotly = require('plotly.js-dist');
 
 let currentProductID = null;
@@ -67,9 +66,9 @@ document.getElementById('fetchData').addEventListener('click', () => {
 });
 
 // Add event listener for the "Go Back" button
-document.querySelector('.goBackButton').addEventListener('click', () => {
+document.querySelector('.goBackProductSearchButton').addEventListener('click', () => {
     // Notify the main process to navigate back to the product search page
-    ipcRenderer.send('navigate-back-to-search');
+    ipcRenderer.send('navigate-back-to-product-search');
 });
 
 document.getElementById('salesAnalysisButton').addEventListener('click', () => {

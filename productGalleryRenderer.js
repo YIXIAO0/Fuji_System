@@ -8,16 +8,20 @@ function renderProductGallery(products) {
 
     products.forEach((product, index) => {
         const productButton = document.createElement('button');
-        productButton.classList.add('product');
+        productButton.classList.add('product-button');
 
         const productName = product.productName;
         const productPathName = productName.replace(/ /g, "_");
+        const productDataString = JSON.stringify(product);
         
         productButton.innerHTML = `
             <img src="./image/products/${productPathName}.png" alt="Product ${product.productID} Image" class="product-image">
             <p class="product-name">${productName}</p>
             <p class="product-price">$${product.productUnitPrice}</p>
         `;
+
+         // Add the data-product attribute to the product button
+        productButton.setAttribute('data-product', productDataString);        
 
         productRow.appendChild(productButton);
 
@@ -31,7 +35,7 @@ function renderProductGallery(products) {
     });
 
     const newProductButton = document.createElement('button');
-    newProductButton.classList.add('product');
+    newProductButton.classList.add('add-product-button');
     newProductButton.innerHTML = `
         <img src="./image/plus.png" alt="Add Image" class="add-product-image">
         <p class="add-title">Add New Product</p>

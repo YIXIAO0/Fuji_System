@@ -14,7 +14,7 @@
     padding-bottom: 40px;
 }
 
-.product {
+.product-button, .add-product-button {
     display: flex;
     width: 180px;
     height: 220px;
@@ -28,7 +28,7 @@
     padding: 10px; /* Add some padding around the content */
 }
 
-.product:hover {
+.product-button:hover, .add-product-button:hover{
     background-color: #f7f7f7; /* Light background on hover */
 }
 
@@ -44,7 +44,7 @@
     margin: 0; /* Remove default margin */
 }
 
-.product:focus {
+.product-button:focus, .add-product-button:focus{
     outline: none; /* Remove default focus outline */
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); /* Add a subtle shadow for focus indication */
     border-radius: 4px;

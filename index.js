@@ -2,12 +2,13 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const connection = require('./database'); // Connect the database
 const productSearchHandler = require('./productSearchHandler'); // Product Search Handler
 const customerSearchHandler = require('./customerSearchHandler'); // Customer Search Handler
+const { eventNames } = require('process');
 let mainWindow;
 
 app.on('ready', () => {
     mainWindow = new BrowserWindow({
-        width: 1200,
-        height: 900,
+        width: 1400,
+        height: 1050,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
@@ -31,11 +32,13 @@ app.on('ready', () => {
             }
         });
     });
+
 });
 
 ipcMain.on('navigate', (event, page) => {
     mainWindow.loadFile(page);
 });
+
 
 // Listen for the product search request from the renderer
 ipcMain.on('perform-product-search', (event, searchQuery) => {
@@ -72,6 +75,19 @@ ipcMain.on('open-product-details', (event, productData) => {
     mainWindow.loadFile('productDetails.html');
 });
 
+ipcMain.on('open-customer-details', (event, customerData) => {
+    mainWindow.webContents.once('did-fail-load', (event, errorCode, errorDescription) => {
+        console.error("Failed to load:", errorCode, errorDescription);
+    });
+
+    mainWindow.webContents.once('did-finish-load', () => {
+        // Once the file is loaded, send the customer data to the renderer
+        mainWindow.webContents.send('customer-details', customerData);
+    });
+
+    mainWindow.loadFile('customerDetails.html');
+});
+
 
 // Listen for the customer search request from the renderer
 ipcMain.on('perform-customer-search', (event, searchQuery) => {
@@ -86,6 +102,7 @@ ipcMain.on('perform-customer-search', (event, searchQuery) => {
 });
 
 ipcMain.on('request-all-customers', (event) => {
+
     connection.query('SELECT * FROM Customers', (err, results) => {
         if (err) {
             mainWindow.webContents.send('customers-data-error', err.message);
@@ -95,9 +112,13 @@ ipcMain.on('request-all-customers', (event) => {
     });
 });
 
-ipcMain.on('navigate-back-to-search', () => {
+ipcMain.on('navigate-back-to-product-search', () => {
     mainWindow.loadFile('productSearchPage.html');
 });
+
+ipcMain.on('navigate-back-to-customer-search', () => {
+    mainWindow.loadFile('customerSearchPage.html');
+})
 
 ipcMain.on('fetch-sales-data', (event, data) => {
     const { productID, fromDate, toDate } = data;
@@ -179,6 +200,27 @@ ipcMain.on('fetch-product-sales-history-data', (event, data) => {
     });
 });
 
+ipcMain.on('get-contacts-for-company', (event, data) => {
+    const customerID = data;
+    const query = `
+    SELECT  c.contactID, 
+            c.contactFirstName, 
+            c.contactLastName, 
+            c.contactPhone, 
+            c.contactEmail, c.
+            contactNotes
+    FROM Contacts c
+    JOIN CustomerContacts cc ON c.contactID = cc.contactID
+    WHERE cc.customerID = ${customerID};`
+
+    connection.query(query, customerID, (err, rows) => {
+        if (err) {
+            event.reply('get-contacts-for-company-error', err.message);
+        } else {
+            event.reply('get-contacts-for-company-success', rows);
+        }
+    });
+})
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {

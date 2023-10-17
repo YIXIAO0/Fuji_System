@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
     <!-- <meta http-equiv="Content-Security-Policy" content="default-src *; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;"> -->
-    <title>Product Search</title>
+    <title>Customer Search</title>
     <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
     <link rel="stylesheet" href="style/left-panel.css">
     <link rel="stylesheet" href="style/copy-right.css">
@@ -45,14 +45,11 @@
                 <table>
                     <thead>
                       <tr>
-                        <th>Customer ID</th>
-                        <th>Business Name</th>
-                        <th>Industry</th>
+                        <th>Company</th>
+                        <th>Sector</th>
                         <th>Category</th>
-                        <th>Phone</th>
-                        <th>Fax</th>
-                        <th>E-mail</th>
-                        <th>Details</th>
+                        <th>Delivery Schedule</th>
+                        <th>Status</th>
                       </tr>
                     </thead>
                     <tbody id="customersTableBody">
@@ -60,7 +57,7 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td colspan="8">
+                            <td colspan="6">
                                 <button id="addButton"><img src="image/plus.png" alt="Add" id="addIcon"></button>
                             </td>
                         </tr>

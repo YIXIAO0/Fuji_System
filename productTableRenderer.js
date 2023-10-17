@@ -5,32 +5,37 @@ function renderProductTable(products) {
 
     products.forEach(product => {
         const row = document.createElement('tr');
-
+        row.classList.add('product-table-row');
         const productDataString = JSON.stringify(product);
-        const productIDLink = `
-        <a href="#" class="product-id-link" data-product='${productDataString}' style="color: blue; text-decoration: underline;">
-            ${product.productID}
-        </a>`;
+        row.setAttribute('data-product', productDataString);
     
-        const detailsButton = `
-            <button class="product-details-button" data-product='${productDataString}'>
-                Details
-            </button>`;
-            
-        let available = product.productIsAvailable === 1 ? 'Yes' : 'No';
+        let availableButton;
+        if (product.productIsAvailable === 1){
+            availableButton = '<button class="available-button">Available</button>';
+        }else{
+            availableButton = '<button class="unavailable-button">Unavailable</button>';
+        }
+        const currProductUnitPrice = `$${product.productUnitPrice}`;
         
         row.innerHTML = `
-            <td>${productIDLink}</td>
             <td>${product.productName}</td>
-            <td>${product.productUnitPrice}</td>
-            <td>${available}</td>
-            <td>${product.productShelfLife}</td>
             <td>${product.productCategory}</td>
-            <td>${detailsButton}</td>
+            <td>${currProductUnitPrice}</td>
+            <td>${shelfLifeConversion(product.productShelfLife)}</td>
+            <td>${availableButton}</td>
         `;
         
         tableBody.appendChild(row);
     });
+}
+
+function shelfLifeConversion(input){
+    if (input === 1){
+        return "1 day";
+    }else{
+        return `${input} days`;
+    }
+
 }
 
 module.exports = { renderProductTable };

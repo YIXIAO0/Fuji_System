@@ -1,0 +1,44 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
+    <title>Customer Details</title>
+    <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
+    <link rel="stylesheet" href="style/customer-details.css">
+    <link rel="stylesheet" href="style/copy-right.css">
+</head>
+<body>
+    <div class="header">
+        <button class="goBackCustomerSearchButton"><img src="./image/go-back.png" alt="GoBack"></button>
+        <span id="customerNameDisplay"></span>
+    </div>
+    <div class="main-customer-details-section">
+        <div class="top-customer-details-section">
+            <div class="customer-information-section">
+                <div class="customer-details-section"></div>
+                <div class="customer-contact-section">
+                    <div class="customer-category-row">
+                        <div class="customer-sector-information"></div>
+                        <div class="customer-category-information"></div>
+                    </div>
+                    <div class="customer-business-number">
+                        <table id="company-info" class="company-info"></table>
+                    </div>
+                    <div class="customer-contacts-table">
+                        <div class="contacts-table-title">Company Contacts</div>
+                        <div id="contacts-table" class="contacts-table"></div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="customer-sales-analysis-section"></div>
+        </div>
+        <div class="bottom-customer-details-section"></div>
+    </div>
+    <div class="copy-right">
+        © 2023 Yi & Winston. All rights reserved.
+    </div> 
+    <script src="./customerDetailsRenderer.js"></script>
+</body>
+</html>

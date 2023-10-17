@@ -1,0 +1,206 @@
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    margin: 0;
+    font-family: 'Roboto';
+    overflow: hidden; /* prevent any unwanted overflow */
+    white-space: nowrap;
+}
+
+.header {
+    background-color: #DDDAD9;
+    width: 100%; /* take the full width */
+    display: flex;
+    flex-direction: row;
+    height: 50px;
+}
+
+.goBackCustomerSearchButton {
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 5px; /* Space around the image */
+}
+
+.goBackCustomerSearchButton img {
+    width: 30px; /* Set a size for the images */
+    height: 30px;
+}
+
+.goBackCustomerSearchButton:hover {
+    background-color: #d0d0d0;  /* Slightly darker background on hover for feedback */
+}
+
+#customerNameDisplay {
+    margin: 0; /* Remove default margin */
+    padding-left: 20px;
+    padding-top: 6px;
+    font-family: 'Roboto';
+    font-size: 32px;
+    font-weight: 700;
+    /* Any other specific styles you want for the title */
+}
+
+.main-customer-details-section {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    width: 100%; /* take the full width */
+    background-color: white;
+}
+
+.top-customer-details-section {
+    display: flex;
+    flex: 50%;
+    flex-direction: row;
+}
+
+.bottom-customer-details-section {
+    background-color: aquamarine;
+    display: flex;
+    flex: 50%;
+}
+
+.customer-information-section {
+    background-color: white;
+    display: flex;
+    flex: 45%;
+    flex-direction: column; 
+}
+
+.customer-details-section {
+    display: flex;
+    flex: 15%;
+    padding-bottom: 10px;
+    padding-left: 40px;
+}
+
+.detail-label-text {
+    font-size: 16px;
+    font-weight: bold;
+
+}
+
+.detail-value-text{
+    background-color: #d9d9d9;
+    border-radius: 8px;
+    padding: 2px 4px; /* Optional: Adds some space around the text within the background */
+    font-size: 16px;
+}
+
+.active-status-text {
+    background-color: rgba(22, 192, 152, 0.38);
+    border-radius: 8px;
+    padding: 2px 4px; /* Optional: Adds some space around the text within the background */
+    font-size: 16px;
+}
+
+.inactive-status-text {
+    background-color: #FFC5C5;
+    border-radius: 8px;
+    padding: 2px 4px; /* Optional: Adds some space around the text within the background */
+    font-size: 16px;
+}
+
+.customer-detail-text {
+    margin-bottom: 8px;;
+}
+
+.customer-contact-section {
+    display: flex;
+    flex: 85%;
+    flex-direction: column;
+}
+
+.customer-category-row{
+    display: flex;
+    flex: 8%;
+    flex-direction: row;
+    background-color: beige;
+}
+
+.customer-sector-information {
+    display: flex;
+    flex: 50%;
+    padding-left: 40px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.sector-value-text {
+    background-color: #d9d9d9;
+    width: 120px;
+    border-radius: 8px;
+    font-size: 18px;
+    padding-left: 5px;
+    margin-left: 15px;
+    margin-bottom: 1.5%;
+}
+
+.customer-category-information {
+    display: flex;
+    flex: 50%;
+    padding-left: 40px;
+    font-size: 18px;
+}
+
+.category-value-text {
+    background-color: #d9d9d9;
+    width: 120px;
+    border-radius: 8px;
+    font-size: 18px;
+    padding-left: 5px;
+    margin-left: 15px;
+    margin-bottom: 1.5%;
+}
+
+.customer-business-number {
+    display: flex;
+    flex: 32%;
+    padding-left: 36px;
+    flex-direction: column;
+    background-color: #FFC5C5;
+}
+
+.customer-business-number-row {
+    font-size: 18px;
+    padding-top: 20px;
+    font-weight: bold;
+    padding-bottom: 20px;
+}
+
+.info-value {
+    padding-left: 5px;
+    margin-left: 80px;
+    background-color: #d9d9d9;
+    width: 350px;
+    border-radius: 8px;
+}
+
+.customer-contacts-table {
+    display: flex;
+    flex: 60%;
+    background-color:bisque;
+    flex-direction: column;
+}
+
+.contacts-table-title{
+    display: flex;
+    flex: 20%;
+    background-color:aliceblue;
+    font-size: 18px;
+    font-weight: bold;
+    padding-left: 39px;
+}
+
+.contacts-table {
+    display: flex;
+    flex: 80%;
+}
+
+.customer-sales-analysis-section {
+    background-color:azure;
+    display: flex;
+    flex: 55%
+}

@@ -11,6 +11,7 @@ const galleryToggle = document.getElementById('galleryToggle');
 const productSearchBar = document.getElementById('productSearchBar');
 const customerSearchBar = document.getElementById('customerSearchBar');
 const productsTableBody = document.getElementById('productsTableBody');
+const productsGallery = document.getElementById('content-product-gallery-page');
 const customersTableBody = document.getElementById('customersTableBody');
 
 if (tableToggle) {
@@ -24,15 +25,15 @@ if (galleryToggle) {
 ipcRenderer.on('products-data', (event, products) => {
     if (productsTableBody) {
         renderProductTable(products);
+    }
+    if (productsGallery) {
         renderProductGallery(products);
-        console.log("Received products data");
     }
 });
 
 ipcRenderer.on('customers-data', (event, customers) => {
     if (customersTableBody) {
         renderCustomerTable(customers);
-        console.log("Received customers data");
     }
 });
 
@@ -72,11 +73,46 @@ if (customerSearchBar) {
 }
 
 document.addEventListener('click', (event) => {
-    if (event.target.classList.contains('product-id-link') || event.target.classList.contains('product-details-button')) {
+    // Check if the clicked element is within a product row with class "product-table-row"
+    let row = event.target.closest('tr.product-table-row');
+    if (row) {
         event.preventDefault();
-        // Fetching the product data (or just the product ID) from the clicked element
-        const productData = JSON.parse(event.target.getAttribute('data-product'));
+        // Extract the product data from the row's data-product attribute
+        const productData = JSON.parse(row.getAttribute('data-product'));
         // Sending the product data to the main process to open the product details page
+        ipcRenderer.send('open-product-details', productData);
+    }
+});
+
+document.addEventListener('click', (event) => {
+    // Check if the clicked element is within a customer row with class "customer-table-row"
+    let row = event.target.closest('tr.customer-table-row');
+    if (row) {
+        event.preventDefault();
+        // Extract the customer data from the row's data-customer attribute
+        const customerData = JSON.parse(row.getAttribute('data-customer'));
+        // Sending the customer data to the main process to open the product details page
+        ipcRenderer.send('open-customer-details', customerData);
+    }
+});
+
+
+// Event delegation case: needs to deal with events on complex elements. (ensures that no matter 
+// where you click within the confines of the button, the event is always correctly detected and handled.)
+document.addEventListener('click', (event) => {
+    let targetElement = event.target; // start with the target element itself
+
+    // traverse up the DOM tree until we find an element with the 'product-button' class
+    // or until we reach the document body
+    while (targetElement != null && !targetElement.classList.contains('product-button')) {
+        targetElement = targetElement.parentElement;
+    }
+
+    // if we found an element with the 'product-button' class, handle the click event
+    if (targetElement && targetElement.classList.contains('product-button')) {
+        event.preventDefault();
+
+        const productData = JSON.parse(targetElement.getAttribute('data-product'));
         ipcRenderer.send('open-product-details', productData);
     }
 });

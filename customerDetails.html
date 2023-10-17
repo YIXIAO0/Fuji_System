@@ -16,25 +16,25 @@
     <div class="main-customer-details-section">
         <div class="top-customer-details-section">
             <div class="customer-information-section">
-                <div class="customer-details-section"></div>
-                <div class="customer-contact-section">
-                    <div class="customer-category-row">
-                        <div class="customer-sector-information"></div>
-                        <div class="customer-category-information"></div>
-                    </div>
+                <div class="toggle-buttons">
+                    <button id="customer-basic-info-button" class="toggle-button active">Basic Info</button>
+                    <button id="customer-contact-info-button" class="toggle-button">Contact Info</button>
+                </div>
+                <div id="basic-info-section" class="content-section active-content">
+                    <div class="customer-details-section"></div>
                     <div class="customer-business-number">
                         <table id="company-info" class="company-info"></table>
                     </div>
-                    <div class="customer-contacts-table">
-                        <div class="contacts-table-title">Company Contacts</div>
-                        <div id="contacts-table" class="contacts-table"></div>
-
-                    </div>
+                </div>
+                <div id="contact-info-section" class="content-section">
+                    <div id="contacts-table" class="contacts-table"></div>
                 </div>
             </div>
             <div class="customer-sales-analysis-section"></div>
         </div>
-        <div class="bottom-customer-details-section"></div>
+        <div class="bottom-customer-details-section">
+            <div id="order-history-section" class="order-history-section"></div>
+        </div>
     </div>
     <div class="copy-right">
         © 2023 Yi & Winston. All rights reserved.

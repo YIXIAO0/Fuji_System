@@ -15,6 +15,8 @@ ipcRenderer.on('customer-details', (event, customerData) => {
     const details = [
         {label: 'Status', value: isActive},
         {label: 'Must Check', value: mustCheck},
+        {label: 'Sector', value: customerData.customerCategory_0},
+        {label: 'Category', value: customerData.customerCategory_1},
         {label: 'Delivery Schedule', value: numToName(customerData.customerSchedule)}
     ]
 
@@ -45,30 +47,6 @@ ipcRenderer.on('customer-details', (event, customerData) => {
     })
     customerDetailsSection.appendChild(customerDetailsList);
 
-    // Customer Sector Information
-    const sectorSection = document.querySelector('.customer-sector-information');
-    const sectorLabelSpan = document.createElement('span');
-    sectorLabelSpan.textContent = "Sector: ";
-    sectorLabelSpan.classList.add('sector-label-text');
-    sectorSection.appendChild(sectorLabelSpan);
-
-    const sectorValueSpan = document.createElement('span');
-    sectorValueSpan.textContent = `${customerData.customerCategory_0}`;
-    sectorValueSpan.classList.add('sector-value-text');
-    sectorSection.appendChild(sectorValueSpan);
-
-    // Customer Category Information
-    const categorySection = document.querySelector('.customer-category-information');
-    const categoryLabelSpan = document.createElement('span');
-    categoryLabelSpan.textContent = "Category: ";
-    categoryLabelSpan.classList.add('category-label-text');
-    categorySection.appendChild(categoryLabelSpan);
-
-    const categoryValueSpan = document.createElement('span');
-    categoryValueSpan.textContent = `${customerData.customerCategory_1}`;
-    categoryValueSpan.classList.add('category-value-text');
-    categorySection.appendChild(categoryValueSpan);
-
     // Customer Phone, Email, Fax information
     const tableBody = document.getElementById('company-info');
     if (!tableBody) return;
@@ -92,19 +70,13 @@ ipcRenderer.on('customer-details', (event, customerData) => {
     });
     currentCustomerID = customerData.customerID;
     ipcRenderer.send('get-contacts-for-company', currentCustomerID);
-});
-
-// Add event listener for the "Go Back" button
-document.querySelector('.goBackCustomerSearchButton').addEventListener('click', () => {
-    // Notify the main process to navigate back to the product search page
-    ipcRenderer.send('navigate-back-to-customer-search');
+    ipcRenderer.send('get-order-history-for-company', currentCustomerID);
 });
 
 // Fetch order history for that product with specfied date range
 ipcRenderer.on('get-contacts-for-company-success', (event, rows) => {
     // Create a table element
     const table = document.createElement('table');
-
     // Add table headers
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
@@ -136,13 +108,89 @@ ipcRenderer.on('get-contacts-for-company-success', (event, rows) => {
     const container = document.getElementById('contacts-table');
     container.innerHTML = ''; // Clear previous content
     container.appendChild(table);
-})
+});
 
 
 ipcRenderer.on('get-contacts-for-company-error', (event, errorMessage) => {
     console.error("Error get contacts for company data error:", errorMessage);
-    alert("Error get contacts for company data. Please try again later.");
-})
+    alert("Error get contacts data for company. Please try again later.");
+});
+
+ipcRenderer.on('get-order-history-for-company-success', (event, rows, currProducts) => {
+    const productNameList = currProducts.map(product => product['productName']);
+    // Create a table element
+    const table = document.createElement('table');
+    table.classList.add('order-history-table');
+    // Add table headers
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    const headers = ['Order ID', 'Date', 'Type', ...productNameList, 'Sales Total', 'Status'];
+    headers.forEach(header => {
+        const th = document.createElement('th');
+        th.textContent = header;
+        headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    // Add table data
+    const tbody = document.createElement('tbody');
+    rows.forEach(row => {
+        const productQuantities = productNameList.map(productName => row[productName]);
+        const isReturn = row.orderIsReturn === 1 ? 'Return' : 'Purchase';
+        const tr = document.createElement('tr');
+        const date = row.orderDate.toISOString().slice(0, 10);
+        const values = [row.orderID, date, isReturn, ...productQuantities, row.orderTotal, row.orderStatus];
+        values.forEach(value => {
+            const td = document.createElement('td');
+            td.textContent = value;
+            tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+
+    // Append the table to the orderHistoryContent div
+    const container = document.getElementById('order-history-section');
+    container.innerHTML = ''; // Clear previous content
+    container.appendChild(table);
+});
+
+
+ipcRenderer.on('get-order-history-for-company-error', (event, errorMessage) => {
+    console.error("Error get order history data for company data error:", errorMessage);
+    alert("Error get order history data for company. Please try again later.");
+});
+
+
+// Add event listener for the "Go Back" button
+document.querySelector('.goBackCustomerSearchButton').addEventListener('click', () => {
+    // Notify the main process to navigate back to the product search page
+    ipcRenderer.send('navigate-back-to-customer-search');
+});
+
+document.getElementById('customer-basic-info-button').addEventListener('click', () => {
+    switchContent('basicInfo');
+});
+
+document.getElementById('customer-contact-info-button').addEventListener('click', () => {
+    switchContent('contactInfo');
+});
+
+function switchContent(section){
+    if (section === 'basicInfo'){
+        document.getElementById('customer-basic-info-button').classList.add('active');
+        document.getElementById('customer-contact-info-button').classList.remove('active');
+        document.getElementById('basic-info-section').classList.add('active-content');
+        document.getElementById('contact-info-section').classList.remove('active-content');
+
+    } else if (section === 'contactInfo'){
+        document.getElementById('customer-contact-info-button').classList.add('active');
+        document.getElementById('customer-basic-info-button').classList.remove('active');
+        document.getElementById('contact-info-section').classList.add('active-content');
+        document.getElementById('basic-info-section').classList.remove('active-content');
+    }
+}
 
 function numToName(charList){
     if (charList.length !== 7){
@@ -172,3 +220,4 @@ function formatNumber(number) {
 
     return `${part1}-${part2}-${part3}`;
 }
+

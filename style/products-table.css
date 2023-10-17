@@ -1,37 +1,55 @@
+/* Main container for the product table */
 .content-product-table-page {
     display: flex;
     margin-top: 40px;
     margin-left: 80px;
     overflow-y: auto;
     overflow-x: scroll;
-    max-width: 1200px;
+    max-width: 1000px;
+    font-family: 'Roboto', sans-serif;
 }
 
+/* Base table styling */
 table {
+    width: 100%;
     border-collapse: collapse;
 }
 
-th, td {
+table th, table td {
+    padding: 8px 30px; 
     border: 1px solid #D9D7D6;
-    padding: 8px;
-    padding-right: 60px;
     text-align: left;
     white-space: nowrap;
-    font-family: 'Roboto', sans-serif;
     font-size: 16px;
 }
 
-th {
-    background-color: #F5F5F5;
+/* Header Styling */
+table thead th {
+    background-color: #009966;
     font-weight: bold;
+    color: #ffffff;/* Dark gray color for better contrast with background */
 }
 
+/* Row Styling */
+table tbody tr:nth-child(odd) {
+    background-color: #f7f7f7; /* Light gray background for alternate rows */
+}
+
+table tbody tr:nth-child(even) {
+    background-color: #ffffff; /* White background for other rows */
+}
+
+table tbody tr:hover {
+    background-color: #e0ffe0; /* A very light green background on hover */
+}
+
+/* Table container styling */
 .table-container {
-    margin-left:20px;
+    margin-left: 20px;
     max-height: 400px;
     max-width: 60%;
-    overflow-y:scroll;
-    overflow-x:auto;
+    overflow-y: scroll;
+    overflow-x: auto;
 }
 
 #addButton {

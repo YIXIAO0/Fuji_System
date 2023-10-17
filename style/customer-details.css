@@ -57,9 +57,10 @@ body {
 }
 
 .bottom-customer-details-section {
-    background-color: aquamarine;
     display: flex;
     flex: 50%;
+    justify-content: center;
+    align-items: center;
 }
 
 .customer-information-section {
@@ -69,7 +70,203 @@ body {
     flex-direction: column; 
 }
 
+.customer-sales-analysis-section {
+    background-color:azure;
+    display: flex;
+    flex: 55%
+}
+
 .customer-details-section {
+    display: flex;
+    flex: 50%;
+    padding-left: 40px;
+}
+
+.customer-business-number {
+    display: flex;
+    flex: 50%;
+    margin-left: 30px;
+    margin-right: 30px;
+}
+
+.toggle-buttons {
+    display:flex;
+    margin-left: 5%;
+    margin-top: 2%;
+}
+
+.toggle-button {
+    padding: 5px, 5px;
+    width: 120px;
+    height: 30px;
+    cursor: pointer;
+    background-color: #D9D9D9;
+    border: 1px solide #D9D9D9;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.toggle-button.active {
+    background-color:#C1C1C1;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.content-section {
+    display: none;
+}
+
+.content-section.active-content {
+    display: block;
+}
+
+
+.detail-label-text {
+    font-size: 18px;
+    font-weight: bold;
+
+}
+
+.detail-value-text{
+    background-color: #d9d9d9;
+    border-radius: 8px;
+    padding: 2px 4px;
+    font-size: 18px;
+}
+
+.active-status-text {
+    background-color: rgba(22, 192, 152, 0.38);
+    border-radius: 8px;
+    padding: 2px 4px; 
+    font-size: 18px;
+}
+
+.inactive-status-text {
+    background-color: #FFC5C5;
+    border-radius: 8px;
+    padding: 2px 4px; 
+    font-size: 18px;
+}
+
+.customer-detail-text {
+    margin-bottom: 8px;;
+}
+
+/* Base table styling */
+#company-info {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+}
+
+#company-info td {
+    padding: 10px 15px;
+    border: 1px solid #e0e0e0; /* Light gray border */
+    vertical-align: middle;
+}
+
+/* Header and Row Styling */
+.customer-business-number-row:nth-child(odd) {
+    background-color: #f7f7f7; /* Light gray background for alternate rows */
+}
+
+.customer-business-number-row:nth-child(even) {
+    background-color: #ffffff; /* White background for other rows */
+}
+
+.customer-business-number-row:hover {
+    background-color: #e0ffe0; /* A very light green background on hover */
+}
+
+/* Label and Value Styling */
+#company-info td:first-child {
+    font-weight: bold;
+    color: #555; /* Dark gray color for labels */
+}
+
+.info-value {
+    color: #009966; /* Green color for values */
+    font-weight: normal;
+}
+
+/* If you have a table header, you can style it like this */
+#company-info thead {
+    background-color: #009966; /* Green background for header */
+}
+
+#company-info thead th {
+    color: #ffffff; /* White text for header cells */
+    padding: 15px;
+    font-weight: bold;
+}
+
+/* Base table styling */
+table {
+    max-width: 80%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+    margin-left: 40px;
+    margin-right: 40px;
+    overflow-x: scroll;
+    overflow-y: auto;
+}
+
+table td, table th {
+    padding: 10px 15px;
+    border: 1px solid #e0e0e0; /* Light gray border */
+    vertical-align: middle;
+}
+
+/* Header Styling */
+table thead {
+    background-color:#66cc99;  /* Green background for header */
+}
+
+/* Styling for the table title */
+h2 {
+    font-family: Arial, sans-serif;
+    color: #009966; /* Same green used for values in the previous table */
+    margin-bottom: 10px;  /* Adds some space between the title and the table */
+    text-align: center;
+}
+
+table thead th {
+    color: #ffffff; /* White text for header cells */
+    font-weight: bold;
+}
+
+/* Row Styling */
+table tbody tr:nth-child(odd) {
+    background-color: #f7f7f7; /* Light gray background for alternate rows */
+}
+
+table tbody tr:nth-child(even) {
+    background-color: #ffffff; /* White background for other rows */
+}
+
+table tbody tr:hover {
+    background-color: #e0ffe0; /* A very light green background on hover */
+}
+
+table td:first-child { 
+    font-weight: bold;
+}
+
+.contacts-table {
+    margin-top: 20px;
+}
+
+.order-history-section {
+    margin: 20px auto;
+    width: 90%;
+    max-height: 300px;
+    overflow-y: scroll;
+    overflow-x: auto;
+}
+
+
+
+/* .customer-details-section {
     display: flex;
     flex: 15%;
     padding-bottom: 10px;
@@ -85,21 +282,21 @@ body {
 .detail-value-text{
     background-color: #d9d9d9;
     border-radius: 8px;
-    padding: 2px 4px; /* Optional: Adds some space around the text within the background */
+    padding: 2px 4px;
     font-size: 16px;
 }
 
 .active-status-text {
     background-color: rgba(22, 192, 152, 0.38);
     border-radius: 8px;
-    padding: 2px 4px; /* Optional: Adds some space around the text within the background */
+    padding: 2px 4px; 
     font-size: 16px;
 }
 
 .inactive-status-text {
     background-color: #FFC5C5;
     border-radius: 8px;
-    padding: 2px 4px; /* Optional: Adds some space around the text within the background */
+    padding: 2px 4px; 
     font-size: 16px;
 }
 
@@ -203,4 +400,5 @@ body {
     background-color:azure;
     display: flex;
     flex: 55%
-}
+} */
+

@@ -285,6 +285,119 @@ ipcMain.on('get-order-history-for-company', async (event, data) => {
     }
 });
 
+ipcMain.on('get-purchased-order-history-for-company', async (event, data) => {
+    try {
+        const currProducts = await getProducts();
+        customerID = data;
+        let productIDQuery = ``;
+
+        currProducts.forEach(currProduct => {
+            productIDQuery += `SUM(CASE WHEN p.productID = '${currProduct['productID']}' THEN op.productQuantity ELSE 0 END) AS '${currProduct['productName']}',`;
+        });
+
+        const get_order_data_query = `
+            SELECT 
+                o.orderID,
+                o.orderDate,
+                o.orderIsReturn,
+                ${productIDQuery}
+                o.orderTotal,
+                o.orderStatus
+            FROM
+                Orders o
+            JOIN 
+                OrderProducts op ON o.orderID = op.orderID
+            JOIN 
+                Products p ON op.productID = p.productID
+            WHERE
+                o.customerID = ${customerID}
+            AND
+                o.orderIsReturn = 0
+            GROUP BY
+                o.orderID,
+                o.orderDate,
+                o.orderIsReturn,
+                o.orderTotal,
+                o.orderStatus;
+        `;
+
+        connection.query(get_order_data_query, customerID, (err, rows) => {
+            if (err) {
+                event.reply('get-purchased-order-history-for-company-error', err.message);
+            } else {
+                event.reply('get-purchased-order-history-for-company-success', rows, currProducts);
+            }
+        });
+    } catch (error) {
+        console.error("Error get purchased order history data for company:", error.message);
+    }
+});
+
+ipcMain.on('get-returned-order-history-for-company', async (event, data) => {
+    try {
+        const currProducts = await getProducts();
+        customerID = data;
+        let productIDQuery = ``;
+
+        currProducts.forEach(currProduct => {
+            productIDQuery += `SUM(CASE WHEN p.productID = '${currProduct['productID']}' THEN op.productQuantity ELSE 0 END) AS '${currProduct['productName']}',`;
+        });
+
+        const get_order_data_query = `
+            SELECT 
+                o.orderID,
+                o.orderDate,
+                o.orderIsReturn,
+                ${productIDQuery}
+                o.orderTotal,
+                o.orderStatus
+            FROM
+                Orders o
+            JOIN 
+                OrderProducts op ON o.orderID = op.orderID
+            JOIN 
+                Products p ON op.productID = p.productID
+            WHERE
+                o.customerID = ${customerID}
+            AND
+                o.orderIsReturn = 1
+            GROUP BY
+                o.orderID,
+                o.orderDate,
+                o.orderIsReturn,
+                o.orderTotal,
+                o.orderStatus;
+        `;
+
+        connection.query(get_order_data_query, customerID, (err, rows) => {
+            if (err) {
+                event.reply('get-returned-order-history-for-company-error', err.message);
+            } else {
+                event.reply('get-returned-order-history-for-company-success', rows, currProducts);
+            }
+        });
+    } catch (error) {
+        console.error("Error get returned order history data for company:", error.message);
+    }
+});
+
+ipcMain.on('fetch-total-sales-data-for-customer', (event, data) => {
+    const { customerID, fromDate, toDate } = data;
+    const query = `
+    SELECT orderDate, orderTotal
+    FROM Orders
+    WHERE customerID = ?
+    AND orderDate BETWEEN ? AND ?
+    `;
+    connection.query(query, [customerID, fromDate, toDate], (err, rows) => {
+        if (err) {
+            event.reply('fetch-total-sales-data-for-customer-error', err.message);
+        } else {
+            event.reply('fetch-total-sales-data-for-customer-success', rows);
+        }
+    });
+});
+
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
         app.quit();

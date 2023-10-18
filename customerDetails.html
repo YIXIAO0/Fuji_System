@@ -30,10 +30,34 @@
                     <div id="contacts-table" class="contacts-table"></div>
                 </div>
             </div>
-            <div class="customer-sales-analysis-section"></div>
+            <div class="customer-sales-analysis-section">
+                <div class="date-selection">
+                    <select id="dateRange">
+                        <option value="lastWeek">Last Week</option>
+                        <option value="lastMonth">Last Month</option>
+                        <option value="past3Months">Past 3 Months</option>
+                        <!-- Add more options as needed -->
+                    </select>
+                    <label for="fromDate">From: </label>
+                    <input type="date" id="fromDate">
+                    
+                    <label for="toDate">To: </label>
+                    <input type="date" id="toDate">
+                    
+                    <button id="fetchData">Fetch Data</button>
+                </div>
+                <div id="salesChart" style="width:100%; height:350px;"></div>
+            </div>
         </div>
         <div class="bottom-customer-details-section">
-            <div id="order-history-section" class="order-history-section"></div>
+            <div class="order-status-toggle-buttons">
+                <button id="all-order-button" class="all-order-button active">All</button>
+                <button id="purchased-order-button" class="purchased-order-button">Purchased</button>
+                <button id="returned-order-button" class="returned-order-button">Returned</button>
+            </div>
+            <div id="order-history-section" class="content-section active-content"></div>
+            <div id="purchased-history-section" class="content-section"></div>
+            <div id="returned-history-section" class="content-section"></div>
         </div>
     </div>
     <div class="copy-right">

@@ -2,6 +2,12 @@ const { ipcRenderer} = require('electron');
 const Plotly = require('plotly.js-dist');
 const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
+// Get the elements
+const dateRangeElement = document.getElementById('dateRange');
+const fromDateElement = document.getElementById('fromDate');
+const toDateElement = document.getElementById('toDate');
+const fetchDataButton = document.getElementById('fetchData');
+
 let currentCustomerID = null;
 ipcRenderer.on('customer-details', (event, customerData) => {
     const customerName = customerData.customerName;
@@ -71,6 +77,8 @@ ipcRenderer.on('customer-details', (event, customerData) => {
     currentCustomerID = customerData.customerID;
     ipcRenderer.send('get-contacts-for-company', currentCustomerID);
     ipcRenderer.send('get-order-history-for-company', currentCustomerID);
+    ipcRenderer.send('get-purchased-order-history-for-company', currentCustomerID);
+    ipcRenderer.send('get-returned-order-history-for-company', currentCustomerID);
 });
 
 // Fetch order history for that product with specfied date range
@@ -140,12 +148,22 @@ ipcRenderer.on('get-order-history-for-company-success', (event, rows, currProduc
         const isReturn = row.orderIsReturn === 1 ? 'Return' : 'Purchase';
         const tr = document.createElement('tr');
         const date = row.orderDate.toISOString().slice(0, 10);
-        const values = [row.orderID, date, isReturn, ...productQuantities, row.orderTotal, row.orderStatus];
+        let statusButton;
+        if (row.orderStatus === 'Completed'){
+            statusButton = '<button class="completed-button">Completed</button>';
+        }else{
+            statusButton = '<button class="cancelled-button">Cancelled</button>';
+        }
+        const values = [row.orderID, date, isReturn, ...productQuantities, row.orderTotal];
         values.forEach(value => {
             const td = document.createElement('td');
             td.textContent = value;
             tr.appendChild(td);
         });
+        // Create a separate td for statusButton and use innerHTML
+        const tdStatus = document.createElement('td');
+        tdStatus.innerHTML = statusButton;
+        tr.appendChild(tdStatus);
         tbody.appendChild(tr);
     });
     table.appendChild(tbody);
@@ -162,6 +180,117 @@ ipcRenderer.on('get-order-history-for-company-error', (event, errorMessage) => {
     alert("Error get order history data for company. Please try again later.");
 });
 
+ipcRenderer.on('get-purchased-order-history-for-company-success', (event, rows, currProducts) => {
+    const productNameList = currProducts.map(product => product['productName']);
+    // Create a table element
+    const table = document.createElement('table');
+    table.classList.add('order-history-table');
+    // Add table headers
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    const headers = ['Order ID', 'Date', 'Type', ...productNameList, 'Sales Total', 'Status'];
+    headers.forEach(header => {
+        const th = document.createElement('th');
+        th.textContent = header;
+        headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    // Add table data
+    const tbody = document.createElement('tbody');
+    rows.forEach(row => {
+        const productQuantities = productNameList.map(productName => row[productName]);
+        const isReturn = row.orderIsReturn === 1 ? 'Return' : 'Purchase';
+        const tr = document.createElement('tr');
+        const date = row.orderDate.toISOString().slice(0, 10);
+        let statusButton;
+        if (row.orderStatus === 'Completed'){
+            statusButton = '<button class="completed-button">Completed</button>';
+        }else{
+            statusButton = '<button class="cancelled-button">Cancelled</button>';
+        }
+        const values = [row.orderID, date, isReturn, ...productQuantities, row.orderTotal];
+        values.forEach(value => {
+            const td = document.createElement('td');
+            td.textContent = value;
+            tr.appendChild(td);
+        });
+        // Create a separate td for statusButton and use innerHTML
+        const tdStatus = document.createElement('td');
+        tdStatus.innerHTML = statusButton;
+        tr.appendChild(tdStatus);
+        tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+
+    // Append the table to the orderHistoryContent div
+    const container = document.getElementById('purchased-history-section');
+    container.innerHTML = ''; // Clear previous content
+    container.appendChild(table);
+});
+
+
+ipcRenderer.on('get-purchased-order-history-for-company-error', (event, errorMessage) => {
+    console.error("Error get purchased order history data for company data error:", errorMessage);
+    alert("Error get purchased order history data for company. Please try again later.");
+});
+
+ipcRenderer.on('get-returned-order-history-for-company-success', (event, rows, currProducts) => {
+    const productNameList = currProducts.map(product => product['productName']);
+    // Create a table element
+    const table = document.createElement('table');
+    table.classList.add('order-history-table');
+    // Add table headers
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    const headers = ['Order ID', 'Date', 'Type', ...productNameList, 'Sales Total', 'Status'];
+    headers.forEach(header => {
+        const th = document.createElement('th');
+        th.textContent = header;
+        headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    // Add table data
+    const tbody = document.createElement('tbody');
+    rows.forEach(row => {
+        const productQuantities = productNameList.map(productName => row[productName]);
+        const isReturn = row.orderIsReturn === 1 ? 'Return' : 'Purchase';
+        const tr = document.createElement('tr');
+        const date = row.orderDate.toISOString().slice(0, 10);
+        let statusButton;
+        if (row.orderStatus === 'Completed'){
+            statusButton = '<button class="completed-button">Completed</button>';
+        }else{
+            statusButton = '<button class="cancelled-button">Cancelled</button>';
+        }
+        const values = [row.orderID, date, isReturn, ...productQuantities, row.orderTotal];
+        values.forEach(value => {
+            const td = document.createElement('td');
+            td.textContent = value;
+            tr.appendChild(td);
+        });
+        // Create a separate td for statusButton and use innerHTML
+        const tdStatus = document.createElement('td');
+        tdStatus.innerHTML = statusButton;
+        tr.appendChild(tdStatus);
+        tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+
+    // Append the table to the orderHistoryContent div
+    const container = document.getElementById('returned-history-section');
+    container.innerHTML = ''; // Clear previous content
+    container.appendChild(table);
+});
+
+
+ipcRenderer.on('get-returned-order-history-for-company-error', (event, errorMessage) => {
+    console.error("Error get returned order history data for company data error:", errorMessage);
+    alert("Error get returned order history data for company. Please try again later.");
+});
 
 // Add event listener for the "Go Back" button
 document.querySelector('.goBackCustomerSearchButton').addEventListener('click', () => {
@@ -189,6 +318,139 @@ function switchContent(section){
         document.getElementById('customer-basic-info-button').classList.remove('active');
         document.getElementById('contact-info-section').classList.add('active-content');
         document.getElementById('basic-info-section').classList.remove('active-content');
+    }
+}
+
+
+document.getElementById('all-order-button').addEventListener('click', () => {
+    switchOrderStatusContent('allOrder');
+});
+
+document.getElementById('purchased-order-button').addEventListener('click', () => {
+    switchOrderStatusContent('purchasedOrder');
+});
+
+document.getElementById('returned-order-button').addEventListener('click', () => {
+    switchOrderStatusContent('returnedOrder');
+});
+
+// Add event listeners
+dateRangeElement.addEventListener('change', checkDateRange);
+fromDateElement.addEventListener('input', () => salesAnalysisForCustomer(currentCustomerID));
+toDateElement.addEventListener('input', () => salesAnalysisForCustomer(currentCustomerID));
+fetchDataButton.addEventListener('click', () => salesAnalysisForCustomer(currentCustomerID));
+
+
+// TODO: Add constraints to the date range
+function salesAnalysisForCustomer(customerID){
+    let fromDate = fromDateElement.value;
+    let toDate = toDateElement.value;
+    
+    if (!fromDate && !toDate) {
+        if (checkDateRange()){
+            return;
+        }
+        alert("Please select both a start and end date, or select a time range.");
+        return;
+    } else if (!fromDate || !toDate) {
+        // Only one date is missing, so just return and wait for the user to fill it
+        return;
+    }
+    
+    // Send a request to the main process to get sales data
+    ipcRenderer.send('fetch-total-sales-data-for-customer', { customerID, fromDate, toDate });
+}
+
+function checkDateRange(){
+    let startDate, endDate;
+    const dateRange = document.getElementById('dateRange');
+    const currentDate = new Date();
+    switch(dateRange.value) {
+        case null:
+            return false;
+        case 'lastWeek':
+            startDate = new Date(currentDate.setDate(currentDate.getDate() - 7));
+            endDate = new Date();
+            break;
+        case 'lastMonth':
+            startDate = new Date(currentDate.setMonth(currentDate.getMonth() - 1));
+            endDate = new Date();
+            break;
+        case 'past3Months':
+            startDate = new Date(currentDate.setMonth(currentDate.getMonth() - 3));
+            endDate = new Date();
+            break;
+    }
+    startDate = formatDate(startDate);
+    endDate = formatDate(endDate);
+    fromDateElement.value = startDate;
+    toDateElement.value = endDate;
+    // Send a request to the main process to get sales data
+    ipcRenderer.send('fetch-total-sales-data-for-customer', {customerID: currentCustomerID, fromDate: startDate, toDate: endDate });
+    return true;
+}
+
+// Line Chart
+ipcRenderer.on('fetch-total-sales-data-for-customer-success', (event, rows) => {
+    // Process rows into format suitable for Plotly.js
+    const dates = rows.map(row => row.orderDate.toISOString().slice(0, 10));
+    const sales = rows.map(row => row.orderTotal);
+    const plotData = [{
+        x: dates,
+        y: sales,
+        type: 'scatter',  // scatter type with mode 'lines' gives a line chart
+        mode: 'lines',
+        name: `Sales Trend (${fromDate.value} to ${toDate.value})`
+    }];
+
+    const layout = {
+        title: `Sales Trend (${fromDate.value} to ${toDate.value})`,
+        xaxis: {
+            title: 'Date',
+            tickformat: '%Y-%m-%d'
+        },
+        yaxis: {
+            title: 'Total Sales'
+        }
+    };
+
+    Plotly.newPlot('salesChart', plotData, layout);
+});
+
+ipcRenderer.on('fetch-total-sales-data-for-customer-error', (event, errorMessage) => {
+    console.error("Error fetching sales data:", errorMessage);
+    alert("Error fetching sales data. Please try again later.");
+});
+
+
+function switchOrderStatusContent(section){
+    if (section === 'allOrder'){
+        document.getElementById('all-order-button').classList.add('active');
+        document.getElementById('purchased-order-button').classList.remove('active');
+        document.getElementById('returned-order-button').classList.remove('active');
+
+        document.getElementById('order-history-section').classList.add('active-content');
+        document.getElementById('purchased-history-section').classList.remove('active-content');
+        document.getElementById('returned-history-section').classList.remove('active-content');
+
+    } else if (section === 'purchasedOrder'){
+        document.getElementById('purchased-order-button').classList.add('active');
+        document.getElementById('all-order-button').classList.remove('active');
+        document.getElementById('returned-order-button').classList.remove('active');
+
+        document.getElementById('purchased-history-section').classList.add('active-content');
+        document.getElementById('order-history-section').classList.remove('active-content');
+        document.getElementById('returned-history-section').classList.remove('active-content');
+        
+    } else if (section === 'returnedOrder'){
+        document.getElementById('returned-order-button').classList.add('active');
+        document.getElementById('all-order-button').classList.remove('active');
+        document.getElementById('purchased-order-button').classList.remove('active');
+
+        document.getElementById('returned-history-section').classList.add('active-content');
+        document.getElementById('order-history-section').classList.remove('active-content');
+        document.getElementById('purchased-history-section').classList.remove('active-content');
+
     }
 }
 
@@ -221,3 +483,14 @@ function formatNumber(number) {
     return `${part1}-${part2}-${part3}`;
 }
 
+function formatDate(date) {
+    const year = date.getFullYear();
+    
+    // Add 1 to the month and ensure it's 2 digits long
+    const month = ("0" + (date.getMonth() + 1)).slice(-2);
+    
+    // Ensure the day is 2 digits long
+    const day = ("0" + date.getDate()).slice(-2);
+    
+    return `${year}-${month}-${day}`;
+}

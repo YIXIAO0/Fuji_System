@@ -1,5 +1,7 @@
 const { ipcRenderer} = require('electron');
 const Plotly = require('plotly.js-dist');
+const fromDateElement = document.getElementById('fromDate');
+const toDateElement = document.getElementById('toDate');
 
 let currentProductID = null;
 
@@ -94,6 +96,7 @@ function switchContent(section){
     }
 }
 
+// TODO: Add constraints to the date range
 function renderSalesAnalysis(productID){
     let fromDate = document.getElementById('fromDate').value;
     let toDate = document.getElementById('toDate').value;

@@ -85,6 +85,7 @@ ipcRenderer.on('customer-details', (event, customerData) => {
 ipcRenderer.on('get-contacts-for-company-success', (event, rows) => {
     // Create a table element
     const table = document.createElement('table');
+    table.classList.add('contacts-table-unique');
     // Add table headers
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
@@ -101,8 +102,8 @@ ipcRenderer.on('get-contacts-for-company-success', (event, rows) => {
     const tbody = document.createElement('tbody');
     rows.forEach(row => {
         const tr = document.createElement('tr');
-        const name = row.contactFirstName + " " + row.contactLastName;
-        const values = [name, row.contactPhone, row.contactEmail, row.contactNotes];
+        const name = row.contactName;
+        const values = [name, formatNumber(row.contactPhone), row.contactEmail, row.contactNotes];
         values.forEach(value => {
             const td = document.createElement('td');
             td.textContent = value;

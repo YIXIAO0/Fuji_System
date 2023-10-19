@@ -28,13 +28,14 @@ ipcRenderer.on('product-details', (event, productData) => {
     // Handle the additional product details 
     const detailsSection = document.querySelector('.product-details-section');
     const detailsList = document.createElement('ul');
-
+    const productShelfLength = productData.productShelfLife === 1? `${productData.productShelfLife} Day` : `${productData.productShelfLife} Days`;
+    
     const details = [
         {label: 'Name', value: productData.productName},
         {label: 'Item ID', value: productData.productID},
         {label: 'Price', value: productData.productUnitPrice},
         {label: 'Status', value: available},
-        {label: 'Shelf Length', value: productData.productShelfLife},
+        {label: 'Shelf Length', value: productShelfLength},
         {label: 'Category', value: productData.productCategory}
     ]
 

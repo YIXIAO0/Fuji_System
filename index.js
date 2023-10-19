@@ -204,8 +204,7 @@ ipcMain.on('get-contacts-for-company', (event, data) => {
     const customerID = data;
     const query = `
     SELECT  c.contactID, 
-            c.contactFirstName, 
-            c.contactLastName, 
+            c.contactName, 
             c.contactPhone, 
             c.contactEmail, c.
             contactNotes

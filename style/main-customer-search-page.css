@@ -129,10 +129,10 @@ body {
 }
 
 .content-customer-table-page {
-    display: flex;
     width: 85%;
+    height: 80%;
     overflow-x: scroll;
-    overflow-y: auto;
+    overflow-y: scroll;
     margin-top: 40px;
     margin-left: 80px;
 }

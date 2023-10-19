@@ -270,6 +270,16 @@ table td:first-child {
 
 .contacts-table {
     margin-top: 20px;
+    height: 250px;
+    width: 600px;
+    overflow-y: scroll;
+    overflow-x: scroll;
+}
+
+.contacts-table-unique td, .contacts-table-unique th {
+    overflow: hidden;         /* Ensures content doesn't overflow the cell */
+    text-overflow: ellipsis;  /* Shows '...' for overflowing content */
+    white-space: nowrap;      /* Prevents text from wrapping to the next line */
 }
 
 #order-history-section, #purchased-history-section, #returned-history-section {
@@ -279,6 +289,13 @@ table td:first-child {
     overflow-y: scroll;
     overflow-x: auto;
 }
+
+.order-history-table td, .order-history-table th, .purchased-history-table td, .purchased-history-table th, .returned-history-table td, .returned-history-table th{
+    overflow: hidden;         /* Ensures content doesn't overflow the cell */
+    text-overflow: ellipsis;  /* Shows '...' for overflowing content */
+    white-space: nowrap;      /* Prevents text from wrapping to the next line */
+}
+
 
 .completed-button, .cancelled-button {
     border: none;

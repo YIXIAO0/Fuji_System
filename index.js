@@ -166,14 +166,32 @@ ipcMain.on('fetch-customer-distribution-data', (event, data) => {
 });
 
 
-ipcMain.on('fetch-product-sales-history-data', (event, data) => {
-    const { productID, fromDate, toDate } = data;
+function fetchProductSalesHistory(event, data, returnType, orderClause='', successEvent, errorEvent) {
+    let productID;
+
+    if (typeof data === 'number') {
+        productID = data;
+    } else {
+        productID = data.productID;
+    }
+    
+    let queryParams = [productID];
+
+    let additionalCondition = '';
+    if (typeof returnType === 'number') {
+        additionalCondition = 'AND o.orderIsReturn = ?';
+        queryParams.push(returnType);
+    }
 
     const query = `
     SELECT 
         o.orderID, 
         o.orderDate,
         o.customerID,
+        o.invoiceID,
+        o.orderChannel,
+        o.orderPO,
+        o.orderStatus,
         c.customerName,
         op.productQuantity,
         (op.productQuantity * p.productUnitPrice) AS totalPrice
@@ -187,18 +205,79 @@ ipcMain.on('fetch-product-sales-history-data', (event, data) => {
         Customers c ON o.customerID = c.customerID
     WHERE 
         p.productID = ?
-    AND
-        o.orderDate BETWEEN ? AND ?
-    `;
-
-    connection.query(query, [productID, fromDate, toDate], (err, rows) => {
+    ${additionalCondition}
+    ${orderClause};`;
+    console.log(query);
+    connection.query(query, queryParams, (err, rows) => {
         if (err) {
-            event.reply('fetch-product-sales-history-data-error', err.message);
+            event.reply(errorEvent, err.message);
         } else {
-            event.reply('fetch-product-sales-history-data-success', rows);
+            event.reply(successEvent, rows);
         }
     });
+}
+
+ipcMain.on('fetch-product-sales-history-data', (event, data) => {
+    fetchProductSalesHistory(event, data, null, '', 'fetch-product-sales-history-data-success', 'fetch-product-sales-history-data-error');
 });
+
+ipcMain.on('fetch-ascending-product-sales-history-data', (event, data) => {
+    fetchProductSalesHistory(event, data, null, 'ORDER BY totalPrice ASC', 'fetch-ascending-product-sales-history-data-success', 'fetch-ascending-product-sales-history-data-error');
+});
+
+ipcMain.on('fetch-descending-product-sales-history-data', (event, data) => {
+    fetchProductSalesHistory(event, data, null, 'ORDER BY totalPrice DESC', 'fetch-descending-product-sales-history-data-success', 'fetch-descending-product-sales-history-data-error');
+});
+
+
+ipcMain.on('fetch-ascending-product-date-history-data', (event, data) => {
+    fetchProductSalesHistory(event, data, null, 'ORDER BY o.orderDate ASC', 'fetch-ascending-product-date-history-data-success', 'fetch-ascending-product-date-history-data-error');
+});
+
+ipcMain.on('fetch-descending-product-date-history-data', (event, data) => {
+    fetchProductSalesHistory(event, data, null, 'ORDER BY o.orderDate DESC', 'fetch-descending-product-date-history-data-success', 'fetch-descending-product-date-history-data-error');
+});
+
+ipcMain.on('fetch-purchased-product-sales-history-data', (event, data) => {
+    fetchProductSalesHistory(event, data, 0, '', 'fetch-purchased-product-sales-history-data-success', 'fetch-purchased-product-sales-history-data-error');
+});
+
+ipcMain.on('fetch-ascending-purchased-product-sales-history-data', (event, data) => {
+    fetchProductSalesHistory(event, data, 0, 'ORDER BY totalPrice ASC', 'fetch-ascending-purchased-product-sales-history-data-success', 'fetch-ascending-purchased-product-sales-history-data-error');
+});
+
+ipcMain.on('fetch-descending-purchased-product-sales-history-data', (event, data) => {
+    fetchProductSalesHistory(event, data, 0, 'ORDER BY totalPrice DESC', 'fetch-descending-purchased-product-sales-history-data-success', 'fetch-descending-purchased-product-sales-history-data-error');
+});
+
+ipcMain.on('fetch-ascending-purchased-product-date-history-data', (event, data) => {
+    fetchProductSalesHistory(event, data, 0, 'ORDER BY o.orderDate ASC', 'fetch-ascending-purchased-product-date-history-data-success', 'fetch-ascending-purchased-product-date-history-data-error');
+});
+
+ipcMain.on('fetch-descending-purchased-product-date-history-data', (event, data) => {
+    fetchProductSalesHistory(event, data, 0, 'ORDER BY o.orderDate DESC', 'fetch-descending-purchased-product-date-history-data-success', 'fetch-descending-purchased-product-date-history-data-error');
+});
+
+ipcMain.on('fetch-returned-product-sales-history-data', (event, data) => {
+    fetchProductSalesHistory(event, data, 1, '', 'fetch-returned-product-sales-history-data-success', 'fetch-returned-product-sales-history-data-error');
+});
+
+ipcMain.on('fetch-ascending-returned-product-sales-history-data', (event, data) => {
+    fetchProductSalesHistory(event, data, 1, 'ORDER BY totalPrice ASC', 'fetch-ascending-returned-product-sales-history-data-success', 'fetch-ascending-purchased-product-sales-history-data-error');
+});
+
+ipcMain.on('fetch-descending-returned-product-sales-history-data', (event, data) => {
+    fetchProductSalesHistory(event, data, 1, 'ORDER BY totalPrice DESC', 'fetch-descending-returned-product-sales-history-data-success', 'fetch-descending-purchased-product-sales-history-data-error');
+});
+
+ipcMain.on('fetch-ascending-returned-product-date-history-data', (event, data) => {
+    fetchProductSalesHistory(event, data, 1, 'ORDER BY o.orderDate ASC', 'fetch-ascending-returned-product-date-history-data-success', 'fetch-ascending-purchased-product-date-history-data-error');
+});
+
+ipcMain.on('fetch-descending-returned-product-date-history-data', (event, data) => {
+    fetchProductSalesHistory(event, data, 1, 'ORDER BY o.orderDate DESC', 'fetch-descending-returned-product-date-history-data-success', 'fetch-descending-purchased-product-date-history-data-error');
+});
+
 
 ipcMain.on('get-contacts-for-company', (event, data) => {
     const customerID = data;
@@ -206,11 +285,12 @@ ipcMain.on('get-contacts-for-company', (event, data) => {
     SELECT  c.contactID, 
             c.contactName, 
             c.contactPhone, 
-            c.contactEmail, c.
-            contactNotes
+            c.contactEmail, 
+            c.contactNotes
     FROM Contacts c
     JOIN CustomerContacts cc ON c.contactID = cc.contactID
-    WHERE cc.customerID = ${customerID};`
+    WHERE cc.customerID = ${customerID}
+    ORDER BY c.contactPriority DESC;`
 
     connection.query(query, customerID, (err, rows) => {
         if (err) {
@@ -238,147 +318,214 @@ function getProducts() {
     });
 }
 
-ipcMain.on('get-order-history-for-company', async (event, data) => {
-    try {
-        const currProducts = await getProducts();
-        customerID = data;
-        let productIDQuery = ``;
+async function buildProductIDQuery() {
+    const currProducts = await getProducts();
+    let productIDQuery = ``;
+    currProducts.forEach(currProduct => {
+        productIDQuery += `SUM(CASE WHEN p.productID = '${currProduct['productID']}' THEN op.productQuantity ELSE 0 END) AS '${currProduct['productName']}',`;
+    });
+    return { productIDQuery, currProducts };
+}
 
-        currProducts.forEach(currProduct => {
-            productIDQuery += `SUM(CASE WHEN p.productID = '${currProduct['productID']}' THEN op.productQuantity ELSE 0 END) AS '${currProduct['productName']}',`;
-        });
+async function fetchOrderData(customerID, orderClause='', isReturn=null) {
+    const { productIDQuery, currProducts } = await buildProductIDQuery();
 
-        const get_order_data_query = `
-            SELECT 
-                o.orderID,
-                o.orderDate,
-                o.orderIsReturn,
-                ${productIDQuery}
-                o.orderTotal,
-                o.orderStatus
-            FROM
-                Orders o
-            JOIN 
-                OrderProducts op ON o.orderID = op.orderID
-            JOIN 
-                Products p ON op.productID = p.productID
-            WHERE
-                o.customerID = ${customerID}
-            GROUP BY
-                o.orderID,
-                o.orderDate,
-                o.orderIsReturn,
-                o.orderTotal,
-                o.orderStatus;
-        `;
+    let returnCondition = '';
+    if (isReturn !== null) {
+        returnCondition = `AND o.orderIsReturn = ${isReturn}`;
+    }
 
+    const get_order_data_query = `
+        SELECT 
+            o.orderID,
+            o.orderDate,
+            o.orderIsReturn,
+            ${productIDQuery}
+            o.orderTotal,
+            o.orderStatus
+        FROM Orders o
+        JOIN OrderProducts op ON o.orderID = op.orderID
+        JOIN Products p ON op.productID = p.productID
+        WHERE o.customerID = ${customerID}
+        ${returnCondition}
+        GROUP BY o.orderID, o.orderDate, o.orderIsReturn, o.orderTotal, o.orderStatus
+        ${orderClause};
+    `;
+
+    return new Promise((resolve, reject) => {
         connection.query(get_order_data_query, customerID, (err, rows) => {
             if (err) {
-                event.reply('get-order-history-for-company-error', err.message);
+                reject(err);
             } else {
-                event.reply('get-order-history-for-company-success', rows, currProducts);
+                resolve({ rows, currProducts });
             }
         });
+    });
+}
+
+ipcMain.on('get-order-history-for-company', async (event, customerID) => {
+    try {
+        const { rows, currProducts } = await fetchOrderData(customerID);
+        event.reply('get-order-history-for-company-success', rows, currProducts);
     } catch (error) {
         console.error("Error get order history data for company:", error.message);
+        event.reply('get-order-history-for-company-error', error.message);
     }
 });
 
-ipcMain.on('get-purchased-order-history-for-company', async (event, data) => {
+ipcMain.on('get-ascending-date-order-history-for-company', async (event, customerID) => {
     try {
-        const currProducts = await getProducts();
-        customerID = data;
-        let productIDQuery = ``;
+        const orderClause = "ORDER BY o.orderDate ASC";
+        const { rows, currProducts } = await fetchOrderData(customerID, orderClause);
+        event.reply('get-ascending-date-order-history-for-company-success', rows, currProducts);
+    } catch (error) {
+        console.error("Error get order history sorted by date asc for company:", error.message);
+        event.reply('get-ascending-date-order-history-for-company-error', error.message);
+    }
+});
 
-        currProducts.forEach(currProduct => {
-            productIDQuery += `SUM(CASE WHEN p.productID = '${currProduct['productID']}' THEN op.productQuantity ELSE 0 END) AS '${currProduct['productName']}',`;
-        });
+ipcMain.on('get-ascending-sales-order-history-for-company', async (event, customerID) => {
+    try {
+        const orderClause = "ORDER BY o.orderTotal ASC";
+        const { rows, currProducts } = await fetchOrderData(customerID, orderClause);
+        event.reply('get-ascending-sales-order-history-for-company-success', rows, currProducts);
+    } catch (error) {
+        console.error("Error get order history sorted by sales asc for company:", error.message);
+        event.reply('get-ascending-sales-order-history-for-companyy-error', error.message);
+    }
+});
 
-        const get_order_data_query = `
-            SELECT 
-                o.orderID,
-                o.orderDate,
-                o.orderIsReturn,
-                ${productIDQuery}
-                o.orderTotal,
-                o.orderStatus
-            FROM
-                Orders o
-            JOIN 
-                OrderProducts op ON o.orderID = op.orderID
-            JOIN 
-                Products p ON op.productID = p.productID
-            WHERE
-                o.customerID = ${customerID}
-            AND
-                o.orderIsReturn = 0
-            GROUP BY
-                o.orderID,
-                o.orderDate,
-                o.orderIsReturn,
-                o.orderTotal,
-                o.orderStatus;
-        `;
 
-        connection.query(get_order_data_query, customerID, (err, rows) => {
-            if (err) {
-                event.reply('get-purchased-order-history-for-company-error', err.message);
-            } else {
-                event.reply('get-purchased-order-history-for-company-success', rows, currProducts);
-            }
-        });
+ipcMain.on('get-descending-date-order-history-for-company', async (event, customerID) => {
+    try {
+        const orderClause = "ORDER BY o.orderDate DESC";
+        const { rows, currProducts } = await fetchOrderData(customerID, orderClause);
+        event.reply('get-descending-date-order-history-for-company-success', rows, currProducts);
+    } catch (error) {
+        console.error("Error get order history sorted by date desc for company:", error.message);
+        event.reply('get-descending-date-order-history-for-company-error', error.message);
+    }
+});
+
+ipcMain.on('get-descending-sales-order-history-for-company', async (event, customerID) => {
+    try {
+        const orderClause = "ORDER BY o.orderTotal DESC";
+        const { rows, currProducts } = await fetchOrderData(customerID, orderClause);
+        event.reply('get-descending-sales-order-history-for-company-success', rows, currProducts);
+    } catch (error) {
+        console.error("Error get order history sorted by date desc for company:", error.message);
+        event.reply('get-descending-sales-order-history-for-company-error', error.message);
+    }
+});
+
+ipcMain.on('get-purchased-order-history-for-company', async (event, customerID) => {
+    try {
+        const { rows, currProducts } = await fetchOrderData(customerID, '', 0);  // 0 for orderIsReturn = Purchase
+        event.reply('get-purchased-order-history-for-company-success', rows, currProducts);
     } catch (error) {
         console.error("Error get purchased order history data for company:", error.message);
+        event.reply('get-purchased-order-history-for-company-error', error.message);
     }
 });
 
-ipcMain.on('get-returned-order-history-for-company', async (event, data) => {
+ipcMain.on('get-ascending-date-purchased-order-history-for-company', async (event, customerID) => {
     try {
-        const currProducts = await getProducts();
-        customerID = data;
-        let productIDQuery = ``;
+        const orderClause = "ORDER BY o.orderDate ASC";
+        const { rows, currProducts } = await fetchOrderData(customerID, orderClause, 0);  // 0 for orderIsReturn = Purchase
+        event.reply('get-ascending-date-purchased-order-history-for-company-success', rows, currProducts);
+    } catch (error) {
+        console.error("Error get ascending purchased order history data for company:", error.message);
+        event.reply('get-ascending-date-purchased-order-history-for-company-error', error.message);
+    }
+});
 
-        currProducts.forEach(currProduct => {
-            productIDQuery += `SUM(CASE WHEN p.productID = '${currProduct['productID']}' THEN op.productQuantity ELSE 0 END) AS '${currProduct['productName']}',`;
-        });
+ipcMain.on('get-ascending-sales-purchased-order-history-for-company', async (event, customerID) => {
+    try {
+        const orderClause = "ORDER BY o.orderTotal ASC";
+        const { rows, currProducts } = await fetchOrderData(customerID, orderClause, 0);  // 0 for orderIsReturn = Purchase
+        event.reply('get-ascending-sales-purchased-order-history-for-company-success', rows, currProducts);
+    } catch (error) {
+        console.error("Error get ascending purchased order history data for company:", error.message);
+        event.reply('get-ascending-sales-purchased-order-history-for-company-error', error.message);
+    }
+});
 
-        const get_order_data_query = `
-            SELECT 
-                o.orderID,
-                o.orderDate,
-                o.orderIsReturn,
-                ${productIDQuery}
-                o.orderTotal,
-                o.orderStatus
-            FROM
-                Orders o
-            JOIN 
-                OrderProducts op ON o.orderID = op.orderID
-            JOIN 
-                Products p ON op.productID = p.productID
-            WHERE
-                o.customerID = ${customerID}
-            AND
-                o.orderIsReturn = 1
-            GROUP BY
-                o.orderID,
-                o.orderDate,
-                o.orderIsReturn,
-                o.orderTotal,
-                o.orderStatus;
-        `;
+ipcMain.on('get-descending-date-purchased-order-history-for-company', async (event, customerID) => {
+    try {
+        const orderClause = "ORDER BY o.orderDate DESC";
+        const { rows, currProducts } = await fetchOrderData(customerID, orderClause, 0);  // 0 for orderIsReturn = Purchase
+        event.reply('get-descending-date-purchased-order-history-for-company-success', rows, currProducts);
+    } catch (error) {
+        console.error("Error get descending purchased order history data for company:", error.message);
+        event.reply('get-descending-date-purchased-order-history-for-company-error', error.message);
+    }
+});
 
-        connection.query(get_order_data_query, customerID, (err, rows) => {
-            if (err) {
-                event.reply('get-returned-order-history-for-company-error', err.message);
-            } else {
-                event.reply('get-returned-order-history-for-company-success', rows, currProducts);
-            }
-        });
+ipcMain.on('get-descending-sales-purchased-order-history-for-company', async (event, customerID) => {
+    try {
+        const orderClause = "ORDER BY o.orderTotal DESC";
+        const { rows, currProducts } = await fetchOrderData(customerID, orderClause, 0);  // 0 for orderIsReturn = Purchase
+        event.reply('get-descending-sales-purchased-order-history-for-company-success', rows, currProducts);
+    } catch (error) {
+        console.error("Error get descending purchased order history data for company:", error.message);
+        event.reply('get-descending-sales-purchased-order-history-for-company-error', error.message);
+    }
+});
+
+ipcMain.on('get-returned-order-history-for-company', async (event, customerID) => {
+    try {
+        const { rows, currProducts } = await fetchOrderData(customerID, '', 1);  // 1 for orderIsReturn = Return
+        event.reply('get-returned-order-history-for-company-success', rows, currProducts);
     } catch (error) {
         console.error("Error get returned order history data for company:", error.message);
+        event.reply('get-returned-order-history-for-company-error', error.message);
     }
 });
+
+ipcMain.on('get-ascending-date-returned-order-history-for-company', async (event, customerID) => {
+    try {
+        const orderClause = "ORDER BY o.orderDate ASC";
+        const { rows, currProducts } = await fetchOrderData(customerID, orderClause, 1);  // 1 for orderIsReturn = Return
+        event.reply('get-ascending-date-returned-order-history-for-company-success', rows, currProducts);
+    } catch (error) {
+        console.error("Error get returned order sort by date (ascending) history data for company:", error.message);
+        event.reply('get-ascending-date-returned-order-history-for-company-error', error.message);
+    }
+});
+
+ipcMain.on('get-ascending-sales-returned-order-history-for-company', async (event, customerID) => {
+    try {
+        const orderClause = "ORDER BY o.orderTotal ASC";
+        const { rows, currProducts } = await fetchOrderData(customerID, orderClause, 1);  // 1 for orderIsReturn = Return
+        event.reply('get-ascending-sales-returned-order-history-for-company-success', rows, currProducts);
+    } catch (error) {
+        console.error("Error get returned order sort by date (descending) history data for company:", error.message);
+        event.reply('get-ascending-sales-returned-order-history-for-company-error', error.message);
+    }
+});
+
+ipcMain.on('get-descending-date-returned-order-history-for-company', async (event, customerID) => {
+    try {
+        const orderClause = "ORDER BY o.orderDate DESC";
+        const { rows, currProducts } = await fetchOrderData(customerID, orderClause, 1);  // 1 for orderIsReturn = Return
+        event.reply('get-descending-date-returned-order-history-for-company-success', rows, currProducts);
+    } catch (error) {
+        console.error("Error get returned order by sort date (descending) history data for company:", error.message);
+        event.reply('get-descending-date-returned-order-history-for-company-error', error.message);
+    }
+});
+
+ipcMain.on('get-descending-sales-returned-order-history-for-company', async (event, customerID) => {
+    try {
+        const orderClause = "ORDER BY o.orderTotal DESC";
+        const { rows, currProducts } = await fetchOrderData(customerID, orderClause, 1);  // 1 for orderIsReturn = Return
+        event.reply('get-descending-sales-returned-order-history-for-company-success', rows, currProducts);
+    } catch (error) {
+        console.error("Error get returned order history by sort sales (descending) data for company:", error.message);
+        event.reply('get-descending-sales-returned-order-history-for-company-error', error.message);
+    }
+});
+
 
 ipcMain.on('fetch-total-sales-data-for-customer', (event, data) => {
     const { customerID, fromDate, toDate } = data;

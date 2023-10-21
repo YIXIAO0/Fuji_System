@@ -7,6 +7,9 @@ const dateRangeElement = document.getElementById('dateRange');
 const fromDateElement = document.getElementById('fromDate');
 const toDateElement = document.getElementById('toDate');
 const fetchDataButton = document.getElementById('fetchData');
+const sortCriteria = document.getElementById('sortCriteria');
+const sortToggle = document.getElementById('sortToggle');
+
 
 let currentCustomerID = null;
 ipcRenderer.on('customer-details', (event, customerData) => {
@@ -89,7 +92,7 @@ ipcRenderer.on('get-contacts-for-company-success', (event, rows) => {
     // Add table headers
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
-    const headers = ['Name', 'Phone', 'Email', 'Note'];
+    const headers = ['Name', 'Phone', 'Email'];
     headers.forEach(header => {
         const th = document.createElement('th');
         th.textContent = header;
@@ -103,13 +106,19 @@ ipcRenderer.on('get-contacts-for-company-success', (event, rows) => {
     rows.forEach(row => {
         const tr = document.createElement('tr');
         const name = row.contactName;
-        const values = [name, formatNumber(row.contactPhone), row.contactEmail, row.contactNotes];
+        const values = [name, formatNumber(row.contactPhone), row.contactEmail];
         values.forEach(value => {
             const td = document.createElement('td');
             td.textContent = value;
             tr.appendChild(td);
         });
         tbody.appendChild(tr);
+        const tr_note = document.createElement('tr');
+        const td_note = document.createElement('td');
+        td_note.colSpan = 3;
+        td_note.textContent = "Note: " + row.contactNotes;
+        tr_note.appendChild(td_note);
+        tbody.appendChild(tr_note);
     });
     table.appendChild(tbody);
 
@@ -119,133 +128,83 @@ ipcRenderer.on('get-contacts-for-company-success', (event, rows) => {
     container.appendChild(table);
 });
 
-
 ipcRenderer.on('get-contacts-for-company-error', (event, errorMessage) => {
     console.error("Error get contacts for company data error:", errorMessage);
     alert("Error get contacts data for company. Please try again later.");
 });
 
 ipcRenderer.on('get-order-history-for-company-success', (event, rows, currProducts) => {
-    const productNameList = currProducts.map(product => product['productName']);
-    // Create a table element
-    const table = document.createElement('table');
-    table.classList.add('order-history-table');
-    // Add table headers
-    const thead = document.createElement('thead');
-    const headerRow = document.createElement('tr');
-    const headers = ['Order ID', 'Date', 'Type', ...productNameList, 'Sales Total', 'Status'];
-    headers.forEach(header => {
-        const th = document.createElement('th');
-        th.textContent = header;
-        headerRow.appendChild(th);
-    });
-    thead.appendChild(headerRow);
-    table.appendChild(thead);
-
-    // Add table data
-    const tbody = document.createElement('tbody');
-    rows.forEach(row => {
-        const productQuantities = productNameList.map(productName => row[productName]);
-        const isReturn = row.orderIsReturn === 1 ? 'Return' : 'Purchase';
-        const tr = document.createElement('tr');
-        const date = row.orderDate.toISOString().slice(0, 10);
-        let statusButton;
-        if (row.orderStatus === 'Completed'){
-            statusButton = '<button class="completed-button">Completed</button>';
-        }else{
-            statusButton = '<button class="cancelled-button">Cancelled</button>';
-        }
-        const values = [row.orderID, date, isReturn, ...productQuantities, row.orderTotal];
-        values.forEach(value => {
-            const td = document.createElement('td');
-            td.textContent = value;
-            tr.appendChild(td);
-        });
-        // Create a separate td for statusButton and use innerHTML
-        const tdStatus = document.createElement('td');
-        tdStatus.innerHTML = statusButton;
-        tr.appendChild(tdStatus);
-        tbody.appendChild(tr);
-    });
-    table.appendChild(tbody);
-
-    // Append the table to the orderHistoryContent div
-    const container = document.getElementById('order-history-section');
-    container.innerHTML = ''; // Clear previous content
-    container.appendChild(table);
+    createAndRenderTable(rows, currProducts, 'order-history-section', 'order-history-table');
 });
 
+ipcRenderer.on('get-ascending-date-order-history-for-company-success', (event, rows, currProducts) => {
+    createAndRenderTable(rows, currProducts, 'order-history-section', 'order-history-table');
+});
 
-ipcRenderer.on('get-order-history-for-company-error', (event, errorMessage) => {
-    console.error("Error get order history data for company data error:", errorMessage);
-    alert("Error get order history data for company. Please try again later.");
+ipcRenderer.on('get-descending-date-order-history-for-company-success', (event, rows, currProducts) => {
+    createAndRenderTable(rows, currProducts, 'order-history-section', 'order-history-table');
+});
+
+ipcRenderer.on('get-ascending-sales-order-history-for-company-success', (event, rows, currProducts) => {
+    createAndRenderTable(rows, currProducts, 'order-history-section', 'order-history-table');
+});
+
+ipcRenderer.on('get-descending-sales-order-history-for-company-success', (event, rows, currProducts) => {
+    createAndRenderTable(rows, currProducts, 'order-history-section', 'order-history-table');
 });
 
 ipcRenderer.on('get-purchased-order-history-for-company-success', (event, rows, currProducts) => {
-    const productNameList = currProducts.map(product => product['productName']);
-    // Create a table element
-    const table = document.createElement('table');
-    table.classList.add('order-history-table');
-    // Add table headers
-    const thead = document.createElement('thead');
-    const headerRow = document.createElement('tr');
-    const headers = ['Order ID', 'Date', 'Type', ...productNameList, 'Sales Total', 'Status'];
-    headers.forEach(header => {
-        const th = document.createElement('th');
-        th.textContent = header;
-        headerRow.appendChild(th);
-    });
-    thead.appendChild(headerRow);
-    table.appendChild(thead);
-
-    // Add table data
-    const tbody = document.createElement('tbody');
-    rows.forEach(row => {
-        const productQuantities = productNameList.map(productName => row[productName]);
-        const isReturn = row.orderIsReturn === 1 ? 'Return' : 'Purchase';
-        const tr = document.createElement('tr');
-        const date = row.orderDate.toISOString().slice(0, 10);
-        let statusButton;
-        if (row.orderStatus === 'Completed'){
-            statusButton = '<button class="completed-button">Completed</button>';
-        }else{
-            statusButton = '<button class="cancelled-button">Cancelled</button>';
-        }
-        const values = [row.orderID, date, isReturn, ...productQuantities, row.orderTotal];
-        values.forEach(value => {
-            const td = document.createElement('td');
-            td.textContent = value;
-            tr.appendChild(td);
-        });
-        // Create a separate td for statusButton and use innerHTML
-        const tdStatus = document.createElement('td');
-        tdStatus.innerHTML = statusButton;
-        tr.appendChild(tdStatus);
-        tbody.appendChild(tr);
-    });
-    table.appendChild(tbody);
-
-    // Append the table to the orderHistoryContent div
-    const container = document.getElementById('purchased-history-section');
-    container.innerHTML = ''; // Clear previous content
-    container.appendChild(table);
+    createAndRenderTable(rows, currProducts, 'purchased-history-section', 'purchased-history-table');
 });
 
+ipcRenderer.on('get-ascending-date-purchased-order-history-for-company-success', (event, rows, currProducts) => {
+    createAndRenderTable(rows, currProducts, 'purchased-history-section', 'purchased-history-table');
+});
 
-ipcRenderer.on('get-purchased-order-history-for-company-error', (event, errorMessage) => {
-    console.error("Error get purchased order history data for company data error:", errorMessage);
-    alert("Error get purchased order history data for company. Please try again later.");
+ipcRenderer.on('get-descending-date-purchased-order-history-for-company-success', (event, rows, currProducts) => {
+    createAndRenderTable(rows, currProducts, 'purchased-history-section', 'purchased-history-table');
+});
+
+ipcRenderer.on('get-ascending-sales-purchased-order-history-for-company-success', (event, rows, currProducts) => {
+    createAndRenderTable(rows, currProducts, 'purchased-history-section', 'purchased-history-table');
+});
+
+ipcRenderer.on('get-descending-sales-purchased-order-history-for-company-success', (event, rows, currProducts) => {
+    createAndRenderTable(rows, currProducts, 'purchased-history-section', 'purchased-history-table');
 });
 
 ipcRenderer.on('get-returned-order-history-for-company-success', (event, rows, currProducts) => {
+    createAndRenderTable(rows, currProducts, 'returned-history-section', 'returned-history-table');
+});
+
+ipcRenderer.on('get-ascending-date-returned-order-history-for-company-success', (event, rows, currProducts) => {
+    createAndRenderTable(rows, currProducts, 'returned-history-section', 'returned-history-table');
+});
+
+ipcRenderer.on('get-descending-date-returned-order-history-for-company-success', (event, rows, currProducts) => {
+    createAndRenderTable(rows, currProducts, 'returned-history-section', 'returned-history-table');
+});
+
+ipcRenderer.on('get-ascending-sales-returned-order-history-for-company-success', (event, rows, currProducts) => {
+    createAndRenderTable(rows, currProducts, 'returned-history-section', 'returned-history-table');
+});
+
+ipcRenderer.on('get-descending-sales-returned-order-history-for-company-success', (event, rows, currProducts) => {
+    createAndRenderTable(rows, currProducts, 'returned-history-section', 'returned-history-table');
+});
+
+function createAndRenderTable(rows, currProducts, containerId, tableClass) {
     const productNameList = currProducts.map(product => product['productName']);
+    
     // Create a table element
     const table = document.createElement('table');
-    table.classList.add('order-history-table');
+    table.classList.add(tableClass);
+    
     // Add table headers
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
     const headers = ['Order ID', 'Date', 'Type', ...productNameList, 'Sales Total', 'Status'];
+    
     headers.forEach(header => {
         const th = document.createElement('th');
         th.textContent = header;
@@ -258,39 +217,116 @@ ipcRenderer.on('get-returned-order-history-for-company-success', (event, rows, c
     const tbody = document.createElement('tbody');
     rows.forEach(row => {
         const productQuantities = productNameList.map(productName => row[productName]);
-        const isReturn = row.orderIsReturn === 1 ? 'Return' : 'Purchase';
+        const isReturn = row.orderIsReturn === 1 ? 'Replace' : 'Purchase';
         const tr = document.createElement('tr');
         const date = row.orderDate.toISOString().slice(0, 10);
         let statusButton;
-        if (row.orderStatus === 'Completed'){
-            statusButton = '<button class="completed-button">Completed</button>';
-        }else{
-            statusButton = '<button class="cancelled-button">Cancelled</button>';
+        
+        switch(row.orderStatus) {
+            case 'Completed':
+                statusButton = '<button class="completed-button">Completed</button>';
+                break;
+            case 'Cancelled':
+                statusButton = '<button class="cancelled-button">Cancelled</button>';
+                break;
+            case 'Delivered':
+                statusButton = '<button class="delivered-button">Delivered</button>';
+                break;
+            case 'Received':
+                statusButton = '<button class="received-button">Received</button>';
+                break;
+            default:
+                statusButton = '';
         }
+        
         const values = [row.orderID, date, isReturn, ...productQuantities, row.orderTotal];
         values.forEach(value => {
             const td = document.createElement('td');
             td.textContent = value;
             tr.appendChild(td);
         });
+        
         // Create a separate td for statusButton and use innerHTML
         const tdStatus = document.createElement('td');
         tdStatus.innerHTML = statusButton;
         tr.appendChild(tdStatus);
+        
         tbody.appendChild(tr);
     });
+    
     table.appendChild(tbody);
 
-    // Append the table to the orderHistoryContent div
-    const container = document.getElementById('returned-history-section');
+    // Append the table to the specified container
+    const container = document.getElementById(containerId);
     container.innerHTML = ''; // Clear previous content
     container.appendChild(table);
+}
+
+
+
+function handleOrderHistoryTableError(errorMessage, type) {
+    console.error(`Error get ${type} order history data for company error:`, errorMessage);
+    alert(`Error get ${type} order history data for company. Please try again later.`);
+}
+
+ipcRenderer.on('get-order-history-for-company-error', (event, errorMessage) => {
+    handleOrderHistoryTableError(errorMessage, 'general');
 });
 
+ipcRenderer.on('get-ascending-date-order-history-for-company-error', (event, errorMessage) => {
+    handleOrderHistoryTableError(errorMessage, 'general (sort by date -- ascending)');
+});
+
+ipcRenderer.on('get-descending-date-order-history-for-company-error', (event, errorMessage) => {
+    handleOrderHistoryTableError(errorMessage, 'general (sort by date -- descending)');
+});
+
+ipcRenderer.on('get-ascending-sales-order-history-for-company-error', (event, errorMessage) => {
+    handleOrderHistoryTableError(errorMessage, 'general (sort by sales -- ascending)');
+});
+
+ipcRenderer.on('get-descending-sales-order-history-for-company-error', (event, errorMessage) => {
+    handleOrderHistoryTableError(errorMessage, 'general (sort by sales -- descending)');
+});
+
+ipcRenderer.on('get-purchased-order-history-for-company-error', (event, errorMessage) => {
+    handleOrderHistoryTableError(errorMessage, 'purchased');
+});
+
+ipcRenderer.on('get-ascending-date-purchased-order-history-for-company-error', (event, errorMessage) => {
+    handleOrderHistoryTableError(errorMessage, 'purchased (sort by date -- ascending)');
+});
+
+ipcRenderer.on('get-descending-date-purchased-order-history-for-company-error', (event, errorMessage) => {
+    handleOrderHistoryTableError(errorMessage, 'purchased (sort by date -- descending)');
+});
+
+ipcRenderer.on('get-ascending-sales-purchased-order-history-for-company-error', (event, errorMessage) => {
+    handleOrderHistoryTableError(errorMessage, 'purchased (sort by sales -- ascending)');
+});
+
+ipcRenderer.on('get-descending-sales-purchased-order-history-for-company-error', (event, errorMessage) => {
+    handleOrderHistoryTableError(errorMessage, 'purchased (sort by sales -- descending)');
+});
 
 ipcRenderer.on('get-returned-order-history-for-company-error', (event, errorMessage) => {
-    console.error("Error get returned order history data for company data error:", errorMessage);
-    alert("Error get returned order history data for company. Please try again later.");
+    handleOrderHistoryTableError(errorMessage, 'returned');
+});
+
+ipcRenderer.on('get-ascending-date-returned-order-history-for-company-error', (event, errorMessage) => {
+    handleOrderHistoryTableError(errorMessage, 'returned');
+});
+
+ipcRenderer.on('get-descending-date-returned-order-history-for-company-error', (event, errorMessage) => {
+    handleOrderHistoryTableError(errorMessage, 'returned');
+});
+
+ipcRenderer.on('get-ascending-sales-returned-order-history-for-company-error', (event, errorMessage) => {
+    handleOrderHistoryTableError(errorMessage, 'returned');
+});
+
+ipcRenderer.on('get-descending-sales-returned-order-history-for-company-error', (event, errorMessage) => {
+    handleOrderHistoryTableError(errorMessage, 'returned');
 });
 
 // Add event listener for the "Go Back" button
@@ -322,6 +358,46 @@ function switchContent(section){
     }
 }
 
+let currentSortOrder = 'ASC'; // Initial sort direction
+
+sortToggle.addEventListener('click', function() {
+    if (currentSortOrder === 'ASC') {
+        currentSortOrder = 'DESC';
+        sortToggle.innerHTML = '&#9660;'; // Change to down arrow for descending
+    } else {
+        currentSortOrder = 'ASC';
+        sortToggle.innerHTML = '&#9650;'; // Change to up arrow for ascending
+    }
+    applySorting();
+});
+
+sortCriteria.addEventListener('change', applySorting);
+
+function applySorting() {
+    const selectedCriteria = sortCriteria.value;
+    if (selectedCriteria === 'date') {
+        if (currentSortOrder === 'ASC') {
+            ipcRenderer.send('get-ascending-date-order-history-for-company', currentCustomerID);
+            ipcRenderer.send('get-ascending-date-purchased-order-history-for-company', currentCustomerID);
+            ipcRenderer.send('get-ascending-date-returned-order-history-for-company', currentCustomerID);
+            
+        } else {
+            ipcRenderer.send('get-descending-date-order-history-for-company', currentCustomerID);
+            ipcRenderer.send('get-descending-date-purchased-order-history-for-company', currentCustomerID);
+            ipcRenderer.send('get-descending-date-returned-order-history-for-company', currentCustomerID);
+        }
+    } else if (selectedCriteria === 'sales') {
+        if (currentSortOrder === 'ASC') {
+            ipcRenderer.send('get-ascending-sales-order-history-for-company', currentCustomerID);
+            ipcRenderer.send('get-ascending-sales-purchased-order-history-for-company', currentCustomerID);
+            ipcRenderer.send('get-ascending-sales-returned-order-history-for-company', currentCustomerID);
+        } else {
+            ipcRenderer.send('get-descending-sales-order-history-for-company', currentCustomerID);
+            ipcRenderer.send('get-descending-sales-purchased-order-history-for-company', currentCustomerID);
+            ipcRenderer.send('get-descending-sales-returned-order-history-for-company', currentCustomerID);
+        }
+    }
+}
 
 document.getElementById('all-order-button').addEventListener('click', () => {
     switchOrderStatusContent('allOrder');

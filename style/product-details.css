@@ -50,35 +50,57 @@ body {
     /* Any other specific styles you want for the title */
 }
 
-
-.product-information-section{
+.main-product-details-section {
     display: flex;
-    flex: 46%;
+    flex: 1;
+    flex-direction: column;
+    width: 100%; /* take the full width */
+    background-color: white;
+}
+
+.top-product-details-section {
+    display: flex;
+    flex: 50%;
     flex-direction: row;
+}
+
+.bottom-product-details-section {
+    display: flex;
+    flex: 50%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.product-information-section {
+    background-color: white;
+    display: flex;
+    flex: 45%;
+    flex-direction: row; 
 }
 
 .product-image-section {
     display: flex;
     flex: 30%;
-    padding-top: 30%;
+    padding-top: 15%;
     padding-left: 5%;
 }
 
 .product-details-section {
     display: flex;
     flex: 70%;
-    padding-top: 23%;
+    padding-top: 12%;
     margin-left: 5%;
     margin-right: 5%;
     flex-direction: column;
 }
 
-.product-analysis-section{
+.product-sales-analysis-section {
     display: flex;
-    flex: 54%;
-    background-color: white;
     flex-direction: column;
+    flex: 55%
 }
+
 
 .product-details-title {
     font-size: 24px;
@@ -99,26 +121,60 @@ body {
     margin-bottom: 15px;  /* Space at the bottom */
 }
 
-.toggle-buttons {
+.toggle-buttons{
     display:flex;
     margin-left: 5%;
-    margin-top: 5%;
+    margin-top: 2%;
 }
 
-.toggle-button {
-    padding: 10px;
-    width: 140px;
+/* Reset the positioning of your controls */
+.order-status-toggle-buttons, 
+.sort-container {
+    position: static;
+}
+
+/* Style for the main wrapper */
+.content-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 20px;
+}
+
+/* Style for the controls container */
+.controls-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 1200px;
+    margin-bottom: 20px;
+}
+
+.toggle-button, .all-order-button, .purchased-order-button, .returned-order-button {
+    padding: 5px, 5px;
+    width: 120px;
+    min-width: 120px;
+    max-width: 120px;
+    height: 30px;
+    min-height: 30px;
+    max-height: 30px;
     cursor: pointer;
     background-color: #D9D9D9;
     border: 1px solide #D9D9D9;
     border-radius: 4px;
     font-size: 16px;
+    margin-right: 5px; 
 }
 
-.toggle-button.active {
+.toggle-button.active, .all-order-button.active, .purchased-order-button.active, .returned-order-button.active {
     background-color:#C1C1C1;
     font-size: 16px;
     font-weight: bold;
+}
+
+.toggle-button:last-child {
+    margin-right: 0;
 }
 
 .content-section {
@@ -130,43 +186,109 @@ body {
 }
 
 .date-selection {
-    padding-left: 5%;
-    padding-top: 6%;;
-}
-
-#salesChart {
-    margin-left: 20px;
-    font-weight: 200px;
+    margin-top: 20px;
 }
 
 #salesAnalysisContent {
-    width: 100%;     
-    max-height: 600px;   
-    overflow-y: auto;  
+    display: flex;
+    flex-direction: row;
+    max-height: 350px;
+    max-width: 800px;
+    overflow-x: scroll;
+    overflow-y: scroll;
 }
 
-#pieChart {
-    margin-left: 20px;
-    font-weight: 200px;
+#sortToggle {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5em; 
 }
 
-#orderHistoryContent {
-    max-height: 600px; 
+#order-history-section, #purchased-history-section, #returned-history-section {
+    margin: 20px;
+    width: 90%;
+    max-height: 300px;
+    overflow-y: scroll;
+    overflow-x: auto;
+}
+
+.order-history-table td, .order-history-table th, .purchased-history-table td, .purchased-history-table th, .returned-history-table td, .returned-history-table th{
+    overflow: hidden;         
+    text-overflow: ellipsis;  
+    white-space: nowrap;     
+}
+
+/* Base table styling */
+table {
+    max-width: 80%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+    margin-left: 40px;
+    margin-right: 40px;
+    overflow-x: scroll;
     overflow-y: auto;
 }
 
-table {
-    width: 90%;
-    margin-top: 20px;
-    margin-left: 10px;
-    border-collapse: collapse;
+table td, table th {
+    padding: 10px 15px;
+    border: 1px solid #e0e0e0; /* Light gray border */
+    vertical-align: middle;
 }
 
-table, th, td {
-    border: 1px solid black;
+/* Header Styling */
+table thead {
+    background-color:#66cc99;  /* Green background for header */
 }
 
-th, td {
-    padding: 8px 12px;
-    text-align: left;
+table thead th {
+    color: #ffffff; /* White text for header cells */
+    font-weight: bold;
+}
+
+/* Row Styling */
+table tbody tr:nth-child(odd) {
+    background-color: #f7f7f7; /* Light gray background for alternate rows */
+}
+
+table tbody tr:nth-child(even) {
+    background-color: #ffffff; /* White background for other rows */
+}
+
+table tbody tr:hover {
+    background-color: #e0ffe0; /* A very light green background on hover */
+}
+
+table td:first-child { 
+    font-weight: bold;
+}
+
+.completed-button, .cancelled-button, .delivered-button, .received-button {
+    border: none;
+    padding: 5px 10px;
+    width: 100px;
+    height: 30px;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: not-allowed; /* This makes the button unclickable */
+}
+
+.completed-button {
+    background-color: rgba(22, 192, 152, 0.38);
+    color: #00B087;
+}
+
+.cancelled-button {
+    background-color: lightgrey;
+    color: grey;
+}
+
+.delivered-button {
+    background-color: rgba(100, 149, 237, 0.38);  
+    color: #6495ED;  
+}
+
+.received-button {
+    background-color: rgba(147, 112, 219, 0.38);  
+    color: #9370DB; 
 }

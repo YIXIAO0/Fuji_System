@@ -50,14 +50,26 @@
             </div>
         </div>
         <div class="bottom-customer-details-section">
-            <div class="order-status-toggle-buttons">
-                <button id="all-order-button" class="all-order-button active">All</button>
-                <button id="purchased-order-button" class="purchased-order-button">Purchased</button>
-                <button id="returned-order-button" class="returned-order-button">Returned</button>
-            </div>
-            <div id="order-history-section" class="content-section active-content"></div>
-            <div id="purchased-history-section" class="content-section"></div>
-            <div id="returned-history-section" class="content-section"></div>
+            <div class="content-wrapper">
+                <div class="controls-container">
+                    <div class="order-status-toggle-buttons">
+                        <button id="all-order-button" class="all-order-button active">All</button>
+                        <button id="purchased-order-button" class="purchased-order-button">Purchased</button>
+                        <button id="returned-order-button" class="returned-order-button">Replaced</button>
+                    </div>
+                    <div class="sort-container">
+                        <label for="sortCriteria">Sort By:</label>
+                        <select id="sortCriteria">
+                            <option value="date">Order Date</option>
+                            <option value="sales">Sales Total</option>
+                        </select>
+                        <button id="sortToggle" title="Toggle Sort Order">&#9650;</button> <!-- Initially set to Up arrow for Ascending -->
+                    </div> 
+                </div>
+                <div id="order-history-section" class="content-section active-content"></div>
+                <div id="purchased-history-section" class="content-section"></div>
+                <div id="returned-history-section" class="content-section"></div>
+            </div>          
         </div>
     </div>
     <div class="copy-right">

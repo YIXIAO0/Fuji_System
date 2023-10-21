@@ -46,8 +46,10 @@
     color: #8bbf56;
 }
 
-.panel-button.active{
+.panel-button.active {
     background-color: #DDDAD9;
+    color: #8bbf56; /* Change text color */
+    font-weight: bold; /* Make the text bolder */
 }
 
 .logo {

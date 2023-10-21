@@ -135,6 +135,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 ipcRenderer.send('navigate', 'productSearchPage.html');
             } else if (button.textContent.trim() === "Customer Info") {
                 ipcRenderer.send('navigate', 'customerSearchPage.html'); 
+            } else if (button.textContent.trim() === "Order Entry") {
+                ipcRenderer.send('navigate', 'orderEntryPage.html');
             }
         });
     });

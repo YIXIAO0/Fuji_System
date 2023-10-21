@@ -207,7 +207,6 @@ function fetchProductSalesHistory(event, data, returnType, orderClause='', succe
         p.productID = ?
     ${additionalCondition}
     ${orderClause};`;
-    console.log(query);
     connection.query(query, queryParams, (err, rows) => {
         if (err) {
             event.reply(errorEvent, err.message);

@@ -131,9 +131,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // Add 'active' class to the clicked button
             button.classList.add('active');
             // Navigation logic
-            if (button.textContent.trim() === "Product Info") {
+            if (button.textContent.trim() === "Products") {
                 ipcRenderer.send('navigate', 'productSearchPage.html');
-            } else if (button.textContent.trim() === "Customer Info") {
+            } else if (button.textContent.trim() === "Customers") {
                 ipcRenderer.send('navigate', 'customerSearchPage.html'); 
             } else if (button.textContent.trim() === "Order Entry") {
                 ipcRenderer.send('navigate', 'orderEntryPage.html');

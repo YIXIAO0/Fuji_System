@@ -13,7 +13,7 @@ body {
     width: 100%; /* take the full width */
     display: flex;
     flex-direction: row;
-    flex: 9.7; /* 97% */
+    flex: 0.97; /* 97% */
 }
 
 .main-customer-table-page {

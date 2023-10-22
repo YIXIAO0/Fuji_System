@@ -4,7 +4,6 @@ const productSearchHandler = require('./productSearchHandler'); // Product Searc
 const customerSearchHandler = require('./customerSearchHandler'); // Customer Search Handler
 const { eventNames } = require('process');
 let mainWindow;
-
 app.on('ready', () => {
     mainWindow = new BrowserWindow({
         width: 1400,
@@ -33,12 +32,37 @@ app.on('ready', () => {
         });
     });
 
+    // IPC listeners for managing orderEntryPage windows:
+
+    ipcMain.on('open-order-entry-page', (event, orderEntryCount) => {
+        let win = new BrowserWindow({ width: 800, height: 600 });
+        win.loadFile('path_to_orderEntryPage.html');
+        
+        windows[orderEntryCount] = win;
+
+        win.on('closed', () => {
+            delete windows[orderEntryCount];
+        });
+    });
+
+    ipcMain.on('close-order-entry-page', (event, orderEntryCount) => {
+        if (windows[orderEntryCount]) {
+            windows[orderEntryCount].close();
+        }
+    });
+
+    ipcMain.on('navigate-order-entry-page', (event, orderEntryCount) => {
+        // Logic for navigating to the respective orderEntryPage, if needed
+        if (windows[orderEntryCount]) {
+            windows[orderEntryCount].focus();
+        }
+    });
+
 });
 
 ipcMain.on('navigate', (event, page) => {
     mainWindow.loadFile(page);
 });
-
 
 // Listen for the product search request from the renderer
 ipcMain.on('perform-product-search', (event, searchQuery) => {

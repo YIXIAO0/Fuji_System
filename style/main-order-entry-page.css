@@ -13,6 +13,90 @@ body {
     width: 100%; /* take the full width */
     display: flex;
     flex-direction: row;
-    flex: 9.7; /* 97% */
+    flex: 0.97; /* 97% */
 }
+
+.main-content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+}
+
+.add-and-close-customer-section {
+    display: flex;
+    flex: 0.05;
+    padding-top: 6px;
+    padding-left: 20px;
+}
+
+#buttonContainer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.close-icon {
+    width: 10px;  /* Adjust as needed */
+    height: 10px; /* Adjust as needed */
+    margin-left: 5px;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.orderEntryButton {
+    font-weight: bold;
+    font-size: 16px;
+    border-radius: 4px;
+    padding-right: 3px;
+    padding-left: 3px;
+    width: 140px;
+    height: 30px;
+    border: 1px solid #cccccc;
+}
+
+.addNewEntry {
+    width: 10px;
+    height: 10px;
+}
+
+/* Hover & Focus styles for .orderEntryButton */
+.orderEntryButton:hover, .orderEntryButton:focus {
+    background-color: #e0e0e0;  /* Example: light gray background */
+    outline: none;  /* Removes the default browser outline */
+    box-shadow: 0 0 5px rgba(70, 70, 70, 0.5);  /* Example: subtle shadow for a "lifted" effect */
+}
+
+/* Hover & Focus styles for .addNewEntry */
+.addNewEntry:hover, .addNewEntry:focus {
+    background-color: #d1d1d1;  /* Example: slightly darker gray than the other button */
+    outline: none;  /* Removes the default browser outline */
+    transform: scale(1.1);  /* Example: slightly enlarges the button */
+}
+
+.main-section {
+    display: flex;
+    flex: 0.95;
+    flex-direction: column;
+}
+
+.page-name {
+    display: flex;
+    flex: 0.05;
+    font-weight: bold;
+    font-size: 30px;
+    padding-left: 20px;
+}
+
+.customer-info-section {
+    display: flex;
+    flex: 0.35;
+    background-color:aquamarine;
+}
+
+.order-section {
+    display: flex;
+    flex: 0.6;
+    background-color:bisque;
+}
+
 

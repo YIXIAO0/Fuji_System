@@ -137,7 +137,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 ipcRenderer.send('navigate', 'customerSearchPage.html'); 
             } else if (button.textContent.trim() === "Order Entry") {
                 ipcRenderer.send('navigate', 'orderEntryPage.html');
-            }
+            }  else if (button.textContent.trim() === "Master Board") {
+                ipcRenderer.send('navigate', 'masterBoardPage.html'); 
+            }  
         });
     });
 });

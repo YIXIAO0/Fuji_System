@@ -567,6 +567,64 @@ ipcMain.on('fetch-total-sales-data-for-customer', (event, data) => {
     });
 });
 
+ipcMain.on('get-order-from-date', async (event, data1, data2) => {
+
+    const orderDate = data1;
+    const orderDayOfWeek = data2;
+    console.log(orderDate);
+    console.log(orderDayOfWeek);
+
+    let query = `
+    SELECT 
+    c.customerName AS 'Company', 
+    o.orderIsReturn AS 'Type', 
+    o.orderPO AS 'PO#', 
+    MAX(CASE WHEN p.productName = '1.25oz Chips' THEN op.productQuantity END) AS '1.25oz Chips',
+    MAX(CASE WHEN p.productName = '2.25oz Chips' THEN op.productQuantity END) AS '2.25oz Chips',
+    MAX(CASE WHEN p.productName = '7.5oz Chips' THEN op.productQuantity END) AS '7.5oz Chips',
+    MAX(CASE WHEN p.productName = '14oz Chips' THEN op.productQuantity END) AS '14oz Chips',
+    MAX(CASE WHEN p.productName = 'Chocolate Bar' THEN op.productQuantity END) AS 'Chocolate Bar',
+    MAX(CASE WHEN p.productName = 'Chocolate Box' THEN op.productQuantity END) AS 'Chocolate Box',
+    o.orderTotal AS 'Sales Total', 
+    o.orderChannel AS 'Channel'
+    FROM 
+    Orders o
+    JOIN 
+    OrderProducts op ON o.orderID = op.orderID
+    JOIN 
+    Products p ON op.productID = p.productID
+    JOIN 
+    Customers c ON o.customerID = c.customerID
+    WHERE 
+    DATE(o.orderDate) = '${orderDate}'
+    GROUP BY 
+    o.orderID, 
+    c.customerName, 
+    o.orderIsReturn, 
+    o.orderPO, 
+    o.orderTotal, 
+    o.orderChannel
+    ORDER BY 
+    o.orderID;
+    `;
+
+    /*const query = `
+    Select *
+    From Orders o
+    Where o.orderDate = ${orderDate};
+    `;*/
+
+    connection.query(query, orderDate, (err, rows) => {
+        if (err) {
+            // console.log(err.message);
+            event.reply('get-order-from-date-error', err.message);
+        } else {
+            // console.log(rows);
+            event.reply('get-order-from-date-success', rows);
+        }
+    });
+});
+
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
         app.quit();

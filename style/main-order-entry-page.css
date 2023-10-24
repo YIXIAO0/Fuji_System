@@ -75,6 +75,7 @@ body {
 
 .main-section {
     display: flex;
+    position: relative;
     flex: 0.95;
     flex-direction: column;
 }
@@ -89,14 +90,274 @@ body {
 
 .customer-info-section {
     display: flex;
-    flex: 0.35;
-    background-color:aquamarine;
+    flex: 1;
+    margin-bottom: 20px; 
+    flex-direction: row;
+    
+}
+
+.customer-info-left-section {
+    display: flex;
+    flex: 0.55;
+    flex-direction: column;
+} 
+
+.search-input {
+    width: 36%;  
+    flex: 1; 
+    padding: 10px;
+    padding-left: 10px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    margin-left: 10px;
+    margin-top: 20px;
+}
+
+.search-bar {
+    position: relative;  /* Establishes a positioning context for the search icon */
+    flex-grow: 1;        /* Allows the wrapper to grow and take up available space */
+    margin-right: 10px;  /* Adds some spacing between the input and the search button */
+    margin-left: 20px;
+}
+
+.customer-title {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.status-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-left: 60px;
+}
+
+.results-container {
+    position: absolute; 
+    margin-top: 56px;
+    max-width: 240px;
+    max-height: 200px;  /* or whatever height you prefer */
+    margin-left: 140px;
+    align-items: center;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    background-color: white;
+    display: none;  /* Initially hidden */
+}
+
+.result-item {
+    padding: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+.result-item:hover {
+    background-color: #f5f5f5;
+}
+
+.button-active {
+    margin-left: 10px;
+    font-size: 20px;
+    width: 100px;           
+    height: 30px;          
+    background-color: rgba(22, 192, 152, 0.38);
+    color: rgba(0, 128, 0, 0.854);
+    border: 1px solid #529c52;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.button-inactive {
+    margin-left: 10px;
+    font-size: 20px;
+    width: 100px;           
+    height: 30px;           
+    background-color: #FFC5C5;
+    color: rgba(251, 50, 50, 0.682);
+    border: 1px solid rgba(251, 50, 50, 0.682);
+    border-radius: 4px;
+    cursor: not-allowed; /* To indicate that the button is in a disabled state */
+}
+
+/* Base table styling */
+table {
+    max-width: 80%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+    margin-left: 20px;
+    margin-right: 20px;
+    overflow-x: scroll;
+    overflow-y: auto;
+}
+
+table td, table th {
+    padding: 10px 15px;
+    border: 1px solid #e0e0e0; /* Light gray border */
+    vertical-align: middle;
+}
+
+/* Header Styling */
+table thead {
+    background-color:#66cc99;  /* Green background for header */
+}
+
+/* Styling for the table title */
+h2 {
+    font-family: Arial, sans-serif;
+    color: #009966; /* Same green used for values in the previous table */
+    margin-bottom: 10px;  /* Adds some space between the title and the table */
+    text-align: center;
+}
+
+table thead th {
+    color: #ffffff; /* White text for header cells */
+    font-weight: bold;
+}
+
+/* Row Styling */
+table tbody tr:nth-child(odd) {
+    background-color: #f7f7f7; /* Light gray background for alternate rows */
+}
+
+table tbody tr:nth-child(even) {
+    background-color: #ffffff; /* White background for other rows */
+}
+
+table tbody tr:hover {
+    background-color: #e0ffe0; /* A very light green background on hover */
+}
+
+table td:first-child { 
+    font-weight: bold;
+}
+
+.contacts-table-unique {
+    margin-top: 20px;
+    height: 150px;
+    width: 500px;
+}
+
+.contacts-table-unique td, .contacts-table-unique th {
+    overflow: hidden;         /* Ensures content doesn't overflow the cell */
+    text-overflow: ellipsis;  /* Shows '...' for overflowing content */
+    white-space: nowrap;      /* Prevents text from wrapping to the next line */
+}
+
+.highlight {
+    background-color: #D9D9D9;
+    border-radius: 4px;
+}
+
+
+.customer-info-right-section {
+    display: flex;
+    flex: 0.45;
+    flex-direction: column;
+    margin-top: 20px;
+    max-width: 500px;
+    overflow-x: scroll;
+    /* background-color: #66cc99; */
+    background-color: #F5F5F5;
+}
+
+.customer-info-right-section p {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.bold-text {
+    font-weight: bold;
 }
 
 .order-section {
     display: flex;
+    flex-direction: row;
     flex: 0.6;
-    background-color:bisque;
 }
 
+.order-entry-section {
+    display: flex;
+    flex-direction: column;
+    flex: 0.4;
+    margin-left: 30px;
+}
 
+.channel-button, .type-button {
+    margin-left: 10px;
+    width: 70px;
+    height: 25px;
+    text-align: center;
+    background-color: #e7e7e7;  /* A blue background color */
+    color: black;  /* Text color */
+    border: none;
+    border-radius: 5px;  /* Rounded corners */
+    cursor: pointer;  /* Change cursor on hover */
+    transition: background-color 0.3s;  /* Smooth transition for hover effect */
+}
+
+.channel-button:hover, .type-button:hover {
+    background-color: #b7b7b7;  /* A darker blue for hover */
+}
+
+.channel-button.selected, .type-button.selected {
+    background-color: #80b7ea;
+    font-weight: bold;
+}
+
+#orderEntryTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 5px;
+    margin-left: 0px;
+}
+
+#orderEntryTable th, #orderEntryTable td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#orderEntryTable th {
+    background-color: #f2f2f2;
+    color: black;
+}
+
+.adjust-quantity-button {
+    margin: 0 3px;
+    width: 40px;
+    height: 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s;
+}
+
+.adjust-quantity-button:hover {
+    background-color: #e7e7e7;
+}
+
+.order-total-row {
+    font-weight: bold;
+    background-color: #f5f5f5;  
+}
+
+.order-purchase-history-section {
+    margin-top: 110px;
+    max-width: 750px;
+    max-height: 600px;
+    overflow-y: scroll;
+    overflow-x: scroll;
+
+}
+
+#orderPurchaseHistoryTable th, #orderPurchaseHistoryTable td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

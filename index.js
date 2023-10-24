@@ -114,16 +114,29 @@ ipcMain.on('open-customer-details', (event, customerData) => {
 
 
 // Listen for the customer search request from the renderer
-ipcMain.on('perform-customer-search', (event, searchQuery) => {
+ipcMain.on('perform-customer-search', (event, searchQuery, count) => {
     customerSearchHandler.handleSearch(searchQuery, connection)
     .then(results => {
-        mainWindow.webContents.send('customers-data', results);
+        mainWindow.webContents.send('customers-data', results, count);
     })
     .catch(error => {
         console.error('Error fetching customers:', error);
         mainWindow.webContents.send('customers-data-error', error.message);
     });
 });
+
+// Listen for the customer search request from the renderer
+ipcMain.on('perform-order-customer-search', (event, searchQuery, count) => {
+    customerSearchHandler.handleSearch(searchQuery, connection)
+    .then(results => {
+        mainWindow.webContents.send('order-customer-data', results, count);
+    })
+    .catch(error => {
+        console.error('Error fetching customers:', error);
+        mainWindow.webContents.send('order-customer-data-error', error.message);
+    });
+});
+
 
 ipcMain.on('request-all-customers', (event) => {
 
@@ -322,7 +335,48 @@ ipcMain.on('get-contacts-for-company', (event, data) => {
             event.reply('get-contacts-for-company-success', rows);
         }
     });
-})
+});
+
+ipcMain.on('get-contacts-for-order-company', (event, data, count) => {
+    const customerID = data;
+    const query = `
+    SELECT  c.contactID, 
+            c.contactName, 
+            c.contactPhone, 
+            c.contactEmail, 
+            c.contactNotes
+    FROM Contacts c
+    JOIN CustomerContacts cc ON c.contactID = cc.contactID
+    WHERE cc.customerID = ${customerID}
+    ORDER BY c.contactPriority DESC;`;
+
+    connection.query(query, customerID, (err, rows) => {
+        if (err) {
+            event.reply('get-contacts-for-order-company-error', err.message);
+        } else {
+            event.reply('get-contacts-for-order-company-success', rows, count);
+        }
+    });
+});
+
+ipcMain.on('get-info-for-order-company', (event, data, count) => {
+    const customerID = data;
+    const query = `
+    SELECT  *
+    FROM Customers c
+    WHERE c.customerID = ${customerID}
+    `;
+
+    connection.query(query, customerID, (err, rows) => {
+        if (err) {
+            event.reply('get-info-for-order-company-error', err.message);
+        } else {
+            event.reply('get-info-for-order-company-success', rows, count);
+        }
+    });
+});
+
+
 
 function getProducts() {
     return new Promise((resolve, reject) => {
@@ -563,6 +617,46 @@ ipcMain.on('fetch-total-sales-data-for-customer', (event, data) => {
             event.reply('fetch-total-sales-data-for-customer-error', err.message);
         } else {
             event.reply('fetch-total-sales-data-for-customer-success', rows);
+        }
+    });
+});
+
+ipcMain.on('get-product-data', (event) => {
+    const query = `
+    SELECT productID, productName, productUnitPrice
+    FROM Products
+    GROUP BY productID, productName, productUnitPrice`;
+
+    connection.query(query, (err, rows) => {
+        if (err) {
+            event.reply('get-product-data-error', err.message);
+        } else {
+            event.reply('get-product-data-success', rows);
+        }
+    });
+});
+
+ipcMain.on('perform-order-history-search-for-customer', (event, customerID, count) => {
+    const query = `
+    SELECT o.orderDate, p.productName, op.productQuantity 
+    FROM Orders o 
+    JOIN (
+        SELECT DISTINCT orderDate 
+        FROM Orders
+        WHERE customerID = ${customerID} 
+        ORDER BY orderDate DESC 
+        LIMIT 5
+    ) AS recentOrders ON o.orderDate = recentOrders.orderDate
+    JOIN OrderProducts op ON o.orderID = op.orderID 
+    JOIN Products p ON op.productID = p.productID 
+    WHERE o.customerID = ${customerID}
+    ORDER BY o.orderDate DESC, p.productName;`;
+
+    connection.query(query, (err, rows) => {
+        if (err) {
+            event.reply('perform-order-history-search-for-customer-error', err.message);
+        } else {
+            event.reply('perform-order-history-search-for-customer-success', rows, count);
         }
     });
 });

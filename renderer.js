@@ -118,6 +118,7 @@ document.addEventListener('click', (event) => {
 });
 
 // Navigation logic for the left panel buttons
+console.log('DOMContentLoaded event fired');
 document.addEventListener('DOMContentLoaded', function() {
     const buttons = document.querySelectorAll(".left-panel .panel-button");
     // Event listener to adjust the 'active' class
@@ -125,6 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
     buttons.forEach(button => {
         button.addEventListener('click', function() {
             // Remove 'active' class from all buttons
+            console.log(buttons);
             buttons.forEach(innerButton => {
                 innerButton.classList.remove('active');
             });
@@ -137,6 +139,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 ipcRenderer.send('navigate', 'customerSearchPage.html'); 
             } else if (button.textContent.trim() === "Order Entry") {
                 ipcRenderer.send('navigate', 'orderEntryPage.html');
+            }  else if (button.textContent.trim() === "Master Board") {
+                ipcRenderer.send('navigate', 'masterBoardPage.html'); 
             }
         });
     });

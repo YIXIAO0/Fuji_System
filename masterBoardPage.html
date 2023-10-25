@@ -1,0 +1,68 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src *; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;"> -->
+    <title>Customer Search</title>
+    <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
+    <link rel="stylesheet" href="style/left-panel.css">
+    <link rel="stylesheet" href="style/copy-right.css">
+    <link rel="stylesheet" href="style/main-master-board-page.css">
+</head>
+<body>
+    <div class="contents">
+        <div class="left-panel">
+            <div class="logo-section">
+                <img src="./image/Fuji_logo.png" alt="Company Logo" class="logo">
+            </div>
+            <div class="panel">
+                <button class="panel-button">Home</button>
+                <button class="panel-button">Products</button>
+                <button class="panel-button">Customers</button>
+                <button class="panel-button active">Master Board</button>
+                <button class="panel-button">Order Entry</button>
+            </div>
+        </div>
+        
+        <div class="main-master-board-page">
+            <div class="header-master-board-page">
+                <h1 class="page-title">Master Board</h1>
+                <div class="top-buttons">
+                    <button class="icon-button"><img src="./image/notification.png" alt="Notifications"></button>
+                    <button class="icon-button"><img src="./image/profile-user.png" alt="Profile"></button>
+                </div>
+            </div>
+            <div class="search-master-board-page">
+                <!--<div class="search-bar">
+                    <input type="search" id="orderSearchBar" class="search-input" placeholder="Search Company">
+                    <img src="./image/search.png" alt="Search Icon" class="search-icon">
+                    <button class="order-search-button">Search</button>
+                    <input type="date" id="orderDate" class="date-selection">
+                </div>-->
+                <div class="left-column">
+                    <div class="item">
+                        <input type="search" id="orderSearchBar" class="search-input" placeholder="Search Company">
+                        <!--<img src="./image/search.png" alt="Search Icon" class="search-icon">-->
+                    </div>
+                    <div class="item">
+                        <input type="date" id="orderDate" class="date-selection">
+                    </div>
+                </div>
+                <div class="right-column">
+                    <!--<h2 style="flex:1;width: 80%;margin:0;"> Day's Summary <h2>-->
+                    <table id="summary-display" class="summary-display"></table>
+                </div>
+            </div>
+            <div class="table-master-board-page">
+                <div id="table-display" class="table-display"></div>
+            </div>
+        </div>
+    </div>
+    <div class="copy-right">
+        © 2023 Yi & Winston. All rights reserved.
+    </div>
+    <!--<script src="./renderer.js"></script>-->    
+    <script src="./masterBoardRenderer.js"></script>
+</body>
+</html>

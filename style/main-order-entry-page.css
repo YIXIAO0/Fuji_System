@@ -223,9 +223,9 @@ table tbody tr:nth-child(even) {
     background-color: #ffffff; /* White background for other rows */
 }
 
-table tbody tr:hover {
-    background-color: #e0ffe0; /* A very light green background on hover */
-}
+/* table tbody tr:hover {
+    background-color: #e0ffe0; 
+} */
 
 table td:first-child { 
     font-weight: bold;
@@ -320,6 +320,10 @@ table td:first-child {
     text-overflow: ellipsis;
 }
 
+#orderEntryTable table tbody tr:hover {
+    background-color: transparent; 
+}
+
 #orderEntryTable th {
     background-color: #f2f2f2;
     color: black;
@@ -342,6 +346,21 @@ table td:first-child {
 .order-total-row {
     font-weight: bold;
     background-color: #f5f5f5;  
+}
+
+.submit-button {
+    background-color: #D9D9D9;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 16px;
+    width: 100px;
+    height: 25px;
+    border: none;
+    cursor: pointer;
+}
+
+.submit-button:hover {
+    background-color: #C8DAEB; /* Note: "clear" is not a valid color value. If you mean transparent, use "transparent" instead. */
 }
 
 .order-purchase-history-section {

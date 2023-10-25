@@ -623,7 +623,7 @@ ipcMain.on('fetch-total-sales-data-for-customer', (event, data) => {
 
 ipcMain.on('get-product-data', (event) => {
     const query = `
-    SELECT productID, productName, productUnitPrice
+    SELECT productID, productName, productUnitPrice, productIsAvailable
     FROM Products
     GROUP BY productID, productName, productUnitPrice`;
 
@@ -660,6 +660,62 @@ ipcMain.on('perform-order-history-search-for-customer', (event, customerID, coun
         }
     });
 });
+
+ipcMain.on('get-last-orderID-request', (event) => {
+    const query = `
+    SELECT MAX(orderID) AS maxOrderID
+    FROM Orders;
+    `;
+
+    connection.query(query, (err, rows) => {
+        if (err){
+            event.reply('get-last-orderID-request-error', err.message);
+        } else {
+            event.reply('get-last-orderID-request-success', rows);
+        }
+    });
+});
+
+ipcMain.on('insert-order', (event, data) => {
+    
+    const { orderID, invoiceID, customerID, orderDate, orderTotal, orderIsReturn, orderChannel, orderStatus, orderPO } = data;
+    const query = `
+        INSERT INTO Orders (orderID, invoiceID, customerID, orderDate, orderTotal, orderIsReturn, orderChannel, orderStatus, orderPO) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    connection.query(query, [orderID, invoiceID, customerID, orderDate, orderTotal, orderIsReturn, orderChannel, orderStatus, orderPO], function(err) {
+        if (err) {
+            console.error('Error inserting data into Orders table:', err);
+            event.reply('insert-order-reply', 'Error inserting into Orders table.');
+            return;
+        }
+        console.log(`Row inserted`);
+        event.reply('insert-order-reply', 'Successfully inserted into Orders table.');
+    });
+});
+
+ipcMain.on('insert-order-product', (event, data) => {
+    
+    const { orderID, productID, productQuantity } = data;
+    const query = `
+        INSERT INTO OrderProducts (orderID, productID, productQuantity) 
+        VALUES (?, ?, ?)
+    `;
+
+    connection.query(query, [orderID, productID, productQuantity], function(err) {
+        if (err) {
+            console.error('Error inserting data into OrderProducts table:', err);
+            event.reply('insert-order-product-reply', 'Error inserting into OrderProducts table.');
+            return;
+        }
+        console.log(`Row inserted`);
+        event.reply('insert-order-product-reply', 'Successfully inserted into OrderProducts table.');
+    });
+});
+
+
+
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {

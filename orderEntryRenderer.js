@@ -1,7 +1,9 @@
 (function() {
     const { ipcRenderer } = require('electron');
     const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+    const prices = {};
     let orderEntryCount = 0;
+    let selectedCustomerID = null;
     let searchTimeout;
 
     document.getElementById('addNewEntry').addEventListener('click', function() {
@@ -192,11 +194,31 @@
         const dateInput = document.createElement('input');
         dateInput.type = 'date';
         dateInput.id = 'date-input';
-        dateInput.addEventListener('change', displayFormattedDate);
+
+        // Get tomorrow's date
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        dateInput.value = formatDate(tomorrow);
+
+        // Set the minimum selectable date to the day after tomorrow
+        dateInput.min = formatDate(tomorrow);
+
+        dateInput.addEventListener('change', event => displayFormattedDate(event, orderEntryCount));
+
         dateSelectionDiv.appendChild(dateInput);
 
         const dayOfWeekSpan = document.createElement('span');
-        dayOfWeekSpan.id = 'day-of-week';
+        dayOfWeekSpan.id = `day-of-week${orderEntryCount}`;
+        // Get the selected date string in 'YYYY-MM-DD' format
+        const [year, month, day] = dateInput.value.split('-').map(part => parseInt(part, 10));
+
+        // Create a new Date object using the parts
+        const selectedDate = new Date(year, month - 1, day);  // month is 0-indexed in JavaScript
+        
+        const options = { weekday: 'long'};
+        dayOfWeekSpan.textContent = " (" + selectedDate.toLocaleDateString(undefined, options) + ")";
+
         dateSelectionDiv.appendChild(dayOfWeekSpan);
         dateSelectionDiv.style.marginBottom = '10px';
 
@@ -217,6 +239,10 @@
             button.addEventListener('click', function() {
                 // Remove 'selected' class from all other channel buttons
                 const selectedChannelButton = channelSelectionDiv.querySelector('.channel-button.selected');
+                if (selectedChannelButton === button) {
+                    button.classList.remove('selected');
+                    return;
+                }
                 if (selectedChannelButton) {
                     selectedChannelButton.classList.remove('selected');
                 }
@@ -243,6 +269,10 @@
             button.addEventListener('click', function() {
                 // Remove 'selected' class from all other type buttons
                 const selectedTypeButton = typeSelectionDiv.querySelector('.type-button.selected');
+                if (selectedTypeButton === button) {
+                    button.classList.remove('selected');  // Unselect on double-click
+                    return;
+                }
                 if (selectedTypeButton) {
                     selectedTypeButton.classList.remove('selected');
                 }
@@ -268,11 +298,10 @@
         poInputDiv.appendChild(poInput);
         poInputDiv.style.marginBottom = '15px';
         orderEntrySection.appendChild(poInputDiv);
-        createOrderEntryTable(orderEntrySection);
+        createOrderEntryTable(orderEntrySection, orderEntryCount);
     }
 
-    function createOrderEntryTable(orderEntrySection){
-        const prices = {};
+    function createOrderEntryTable(orderEntrySection, orderEntryCount){
         const table = document.createElement('table');
         table.id = 'orderEntryTable';
         table.classList.add('order-entry-table');
@@ -295,19 +324,24 @@
         ipcRenderer.on('get-product-data-success', (event, data) => {
             ipcRenderer.removeAllListeners('get-product-data-success');
             // Table body
-            const items = data.map(product => product.productName);
+            // const items = data.map(product => product.productName);
             data.forEach(product => {
                 prices[product.productName] = product.productUnitPrice;
             });
 
-            items.forEach(item => {
+            data.forEach(product => {  // Notice change: iterating over data instead of items
                 const tr = document.createElement('tr');
                 
+                // Check product availability
+                if (product.productIsAvailable === 0) {
+                    tr.style.backgroundColor = '#DCDCDC'; // Set the background color to gray
+                }
+        
                 // Item column
                 const tdItem = document.createElement('td');
-                tdItem.textContent = item;
+                tdItem.textContent = product.productName;  // Using product.productName directly
                 tr.appendChild(tdItem);
-
+        
                 // Quantity column
                 const tdQuantity = document.createElement('td');
                 ['-10', '-1', 'input', '+1', '+10'].forEach(type => {
@@ -319,6 +353,11 @@
                         input.min = '0';   // Set the minimum value
                         input.style.width = '50px';   // Set width
                         input.style.height = '20px';  // Set height
+        
+                        if (product.productIsAvailable === 0) {
+                            input.disabled = true;  // Disable the input
+                        }
+        
                         input.addEventListener('input', updateSales);
                         tdQuantity.appendChild(input);
                     } else {
@@ -329,26 +368,92 @@
                             adjustQuantity(tdQuantity, parseInt(type, 10));
                             updateSales();
                         });
+        
+                        if (product.productIsAvailable === 0) {
+                            button.disabled = true;  // Disable the button
+                        }
+        
                         tdQuantity.appendChild(button);
                     }
                 });
                 tr.appendChild(tdQuantity);
-
+        
                 // Sales column
                 const tdSales = document.createElement('td');
                 tdSales.textContent = '$0.00';  // Default sales value
                 tr.appendChild(tdSales);
-
+        
                 tbody.appendChild(tr);
             });
             // Add the order total row to the table body
             const orderTotalRow = document.createElement('tr');
             orderTotalRow.classList.add('order-total-row');
 
+            // Create the submit button cell
+            const tdSubmit = document.createElement('td');
+
+            const submitButton = document.createElement('button');
+            submitButton.classList.add('submit-button');
+            submitButton.type = 'button';
+            submitButton.textContent = 'Submit';
+            submitButton.addEventListener('click', function(){
+                const currentSection = document.getElementById(`mainSection${orderEntryCount}`);
+                // Step 1: Query the resultsContainer and check if it's filled.
+                const resultsContainer = currentSection.querySelector('.results-container');
+                const isFilled = resultsContainer.hasChildNodes();
+
+                if (!isFilled) {
+                    alert('Customer information is not filled!');
+                    return;
+                }
+
+                // Step 2: Fetch the customerID of the first customer if it exists.
+                if (!selectedCustomerID) {
+                    alert('Please select a customer before proceeding.');
+                    return;
+                }
+
+                // Get selected values
+                const selectedValues = getSelectedValues(orderEntrySection);
+                
+                // Check for null values
+                if (!selectedValues.channel && !selectedValues.type) {
+                    alert('Kindly select both Channel and Type to proceed. Thank you!');
+                    return;
+                }
+                if (!selectedValues.channel){
+                    alert('Kindly select a Channel to proceed. Thank you!');
+                    return;
+                }
+                if (!selectedValues.type){
+                    alert('Kindly select a Type to proceed. Thank you!');
+                    return;
+                }                
+                
+                // Check for quantities
+                let totalQuantity = 0;
+                const quantityInputs = orderEntrySection.querySelectorAll('input[type="number"]');
+                quantityInputs.forEach(input => {
+                    totalQuantity += parseInt(input.value, 10);
+                });
+            
+                if (totalQuantity === 0) {
+                    alert('Please enter a quantity before submitting!');
+                    return;
+                }
+            
+                // If everything is okay, confirm submission
+                const isConfirmed = confirm('Are you sure you want to submit?');
+                if (isConfirmed) {
+                    handleSubmit(orderEntrySection, selectedCustomerID);
+                }
+            });
+            tdSubmit.appendChild(submitButton);
+            orderTotalRow.appendChild(tdSubmit);
+
             const tdLabel = document.createElement('td');
             tdLabel.textContent = 'Order Total:';
-            tdLabel.setAttribute('colspan', '2');  // Span across "Item" and "Quantity" columns
-
+    
             const tdTotal = document.createElement('td');
             tdTotal.textContent = '$0.00';  // Initial total value
 
@@ -382,7 +487,7 @@
             });
 
             // Update the order total row
-            const tdTotal = tbody.querySelector('.order-total-row td:nth-child(2)');
+            const tdTotal = tbody.querySelector('.order-total-row td:nth-child(3)');
             tdTotal.textContent = '$' + totalSales.toFixed(2);
         }
     }
@@ -396,6 +501,7 @@
 
             // Add an event listener to hide the results container when clicked
             item.addEventListener('click', function() {
+                selectedCustomerID = customer.customerID;
                 // Handle the customer selection
                 searchInput.value = customer.customerName;
                 resultsContainer.style.display = 'none';  // Hide the container
@@ -560,7 +666,7 @@
                 const dateObj = new Date(date);
                 const formattedDate = dateObj.toISOString().split('T')[0]; // This will give you YYYY-MM-DD format
                 const weekday = dateObj.toLocaleString('default', { weekday: 'short' });
-                th.textContent = `${formattedDate} (${weekday})`;
+                th.innerHTML = `${formattedDate}<br>${weekday}`;
                 dateRow.appendChild(th);
             });
             thead.appendChild(dateRow);
@@ -643,9 +749,117 @@
         navigateToSection(orderEntryCount);
     }
 
-    function handleSubmit(){
+    function handleSubmit(orderEntrySection, customerID){
+        const selectedValues = getSelectedValues(orderEntrySection);
+        
+        // Use the getLastOrderID function
+        getLastOrderID((error, lastOrderID) => {
+            if (error) {
+                console.error("Error retrieving the last OrderID:", error);
+            } else {
+                let orderID = lastOrderID + 1;
+                const orderData = {
+                    orderID: orderID,
+                    invoiceID: orderID + 34000,
+                    customerID: customerID,
+                    orderDate: selectedValues.date,
+                    orderTotal: calculateOrderTotal(selectedValues.productInfo),
+                    orderIsReturn: selectedValues.type === "Return" ? 1 : 0,
+                    orderChannel: selectedValues.channel,
+                    orderStatus: "Received",
+                    orderPO: selectedValues.poNumber
+                }
+                ipcRenderer.send('insert-order', orderData);
+                //console.log(orderData);
+                ipcRenderer.on('insert-order-reply', (event, message) => {
+                    console.log(message);  // This will either be a success or error message.
+                });
 
+                selectedValues.productInfo.forEach((product, index) => {
+                    if (product.quantity === 0){
+                        return;
+                    }
+                    const orderProductData = {
+                        orderID: orderID,
+                        productID: index + 1,
+                        productQuantity: product.quantity
+                    };
+                    ipcRenderer.send('insert-order-product', orderProductData);
+                    // console.log(orderProductData);
+                });
+                ipcRenderer.on('insert-order-product-reply', (event, message) => {
+                    console.log(message);
+                });
+            }
+        });
     }
+
+    function calculateOrderTotal(productInfo) {
+        let total = 0;
+        productInfo.forEach(product => {
+            // Assuming you have prices stored somewhere or a function to get them:
+            total += product.quantity * prices[product.item];
+        });
+        return total;
+    }
+
+    function getLastOrderID(callback) {
+        // Send a request to the backend to fetch the last orderID from the Orders table.
+        ipcRenderer.send('get-last-orderID-request');
+    
+        // Listen for the successful response from the backend.
+        ipcRenderer.once('get-last-orderID-request-success', (event, rows) => {
+            // Assuming that 'rows' is an array and the first element has the 'maxOrderID' property
+            if (rows && rows.length > 0) {
+                callback(null, rows[0].maxOrderID);
+            } else {
+                callback(new Error('No data returned'));
+            }
+        });
+
+        // Listen for the error response from the backend.
+        ipcRenderer.once('get-last-orderID-request-error', (event, errorMessage) => {
+            callback(new Error(errorMessage));
+        });
+    }
+
+    function getSelectedValues(orderEntrySection) {
+        // Date value
+        const date = orderEntrySection.querySelector('#date-input').value;
+    
+        // Channel value
+        const selectedChannelButton = orderEntrySection.querySelector('.channel-button.selected');
+        const channel = selectedChannelButton ? selectedChannelButton.textContent : null;
+    
+        // Type value
+        const selectedTypeButton = orderEntrySection.querySelector('.type-button.selected');
+        const type = selectedTypeButton ? selectedTypeButton.textContent : null;
+    
+        // PO# value
+        const poNumber = orderEntrySection.querySelector('#po-input').value;
+    
+        // Get quantities and corresponding product's info
+        const table = orderEntrySection.querySelector('#orderEntryTable');
+        const rows = Array.from(table.querySelectorAll('tbody tr:not(.order-total-row)')); // Exclude the order total row
+    
+        const productInfo = rows.map(row => {
+            const item = row.querySelector('td:nth-child(1)').textContent;
+            const quantityInput = row.querySelector('td:nth-child(2) input');
+            const quantity = quantityInput ? parseInt(quantityInput.value, 10) : 0;
+    
+            return { item, quantity };
+        });
+    
+        return {
+            date,
+            channel,
+            type,
+            poNumber,
+            productInfo
+        };
+    }  
+    
+
     function formatNumber(number) {
         const numberString = number.toString();
     
@@ -703,7 +917,7 @@
         return `${part1}-${part2}-${part3}`;
     }
     
-    function displayFormattedDate(event) {
+    function displayFormattedDate(event, count) {
         // Get the selected date string in 'YYYY-MM-DD' format
         const [year, month, day] = event.target.value.split('-').map(part => parseInt(part, 10));
         
@@ -711,7 +925,7 @@
         const selectedDate = new Date(year, month - 1, day);  // month is 0-indexed in JavaScript
         
         const options = { weekday: 'long'};
-        document.getElementById('day-of-week').textContent = " (" + selectedDate.toLocaleDateString(undefined, options) + ")";
+        document.getElementById(`day-of-week${count}`).textContent = " (" + selectedDate.toLocaleDateString(undefined, options) + ")";
     }
     
     module.exports = {

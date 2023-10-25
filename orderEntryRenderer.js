@@ -764,7 +764,7 @@
                     customerID: customerID,
                     orderDate: selectedValues.date,
                     orderTotal: calculateOrderTotal(selectedValues.productInfo),
-                    orderIsReturn: selectedValues.type === "Return" ? 1 : 0,
+                    orderIsReturn: selectedValues.type === "Replace" ? 1 : 0,
                     orderChannel: selectedValues.channel,
                     orderStatus: "Received",
                     orderPO: selectedValues.poNumber

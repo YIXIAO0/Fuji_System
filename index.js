@@ -61,7 +61,13 @@ app.on('ready', () => {
 });
 
 ipcMain.on('navigate', (event, page) => {
-    mainWindow.loadFile(page);
+    mainWindow.loadFile(page)
+    .then(() => {
+    console.log('Success loading HTML file');
+    })
+    .catch((error) => {
+    console.error('Error loading HTML file:', error);
+    })
 });
 
 // Listen for the product search request from the renderer
@@ -567,52 +573,91 @@ ipcMain.on('fetch-total-sales-data-for-customer', (event, data) => {
     });
 });
 
+ipcMain.on('get-company-recent-products', async (event, data) => {
+    const companyName = data;
+    let query = `
+    SELECT productName, COUNT(productName) AS productCount
+    FROM (
+    SELECT o.orderDate, p.productName
+    FROM Orders o
+    JOIN (
+    SELECT DISTINCT orderDate
+    FROM Orders o LEFT JOIN Customers c ON o.customerID = c.customerID
+    WHERE c.customerName = '${companyName}'
+    ORDER BY orderDate DESC
+    LIMIT 5
+    ) AS recentOrders ON o.orderDate = recentOrders.orderDate
+    JOIN OrderProducts op ON o.orderID = op.orderID
+    JOIN Products p ON op.productID = p.productID
+    JOIN Customers c on o.customerID = c.customerID
+    WHERE c.customerName = '${companyName}'
+    GROUP BY o.orderDate, p.productName
+    ) AS recentProducts
+    GROUP BY productName
+    HAVING productCount >= 2;
+    `;
+    connection.query(query, companyName, (err, rows) => {
+        if (err) {
+            // Handle the error
+            console.error(err.message);
+            event.reply('get-company-recent-products-error', err.message);
+        } else {
+            // Extract values from the 'productName' column
+            const productList = rows.map((row) => {
+                return row.productName;
+            });
+    
+            // Send the list of product names as a response
+            event.reply('get-company-recent-products-success', productList);
+        }
+    }); 
+});
+
 ipcMain.on('get-order-from-date', async (event, data1, data2) => {
 
     const orderDate = data1;
     const orderDayOfWeek = data2;
-    console.log(orderDate);
-    console.log(orderDayOfWeek);
+    // console.log(orderDate);
+    // console.log(orderDayOfWeek);
 
     let query = `
     SELECT 
-    c.customerName AS 'Company', 
-    o.orderIsReturn AS 'Type', 
-    o.orderPO AS 'PO#', 
-    MAX(CASE WHEN p.productName = '1.25oz Chips' THEN op.productQuantity END) AS '1.25oz Chips',
-    MAX(CASE WHEN p.productName = '2.25oz Chips' THEN op.productQuantity END) AS '2.25oz Chips',
-    MAX(CASE WHEN p.productName = '7.5oz Chips' THEN op.productQuantity END) AS '7.5oz Chips',
-    MAX(CASE WHEN p.productName = '14oz Chips' THEN op.productQuantity END) AS '14oz Chips',
-    MAX(CASE WHEN p.productName = 'Chocolate Bar' THEN op.productQuantity END) AS 'Chocolate Bar',
-    MAX(CASE WHEN p.productName = 'Chocolate Box' THEN op.productQuantity END) AS 'Chocolate Box',
-    o.orderTotal AS 'Sales Total', 
-    o.orderChannel AS 'Channel'
+    CASE
+        WHEN o.orderID IS NOT NULL THEN 'Ordered'
+        WHEN customerIsMustCheck = 1 THEN 'Must Check'
+        ELSE 'Waiting'
+    END AS 'Status',
+        c.customerName AS 'Company',
+        orderIsReturn AS 'Type',
+        orderPO AS 'PO#', 
+        MAX(CASE WHEN p.productName = '1.25oz Chips' THEN op.productQuantity END) AS '1.25oz Chips',
+        MAX(CASE WHEN p.productName = '2.25oz Chips' THEN op.productQuantity END) AS '2.25oz Chips',
+        MAX(CASE WHEN p.productName = '7.5oz Chips' THEN op.productQuantity END) AS '7.5oz Chips',
+        MAX(CASE WHEN p.productName = '14oz Chips' THEN op.productQuantity END) AS '14oz Chips',
+        MAX(CASE WHEN p.productName = 'Chocolate Bar' THEN op.productQuantity END) AS 'Chocolate Bar',
+        MAX(CASE WHEN p.productName = 'Chocolate Box' THEN op.productQuantity END) AS 'Chocolate Box',
+        orderTotal as 'Sales Total',
+        orderChannel AS 'Channel'
     FROM 
-    Orders o
-    JOIN 
-    OrderProducts op ON o.orderID = op.orderID
-    JOIN 
-    Products p ON op.productID = p.productID
-    JOIN 
-    Customers c ON o.customerID = c.customerID
+        Customers c 
+    LEFT JOIN Orders o ON c.customerID = o.customerID AND o.orderDate = '${orderDate}'
+    LEFT JOIN OrderProducts op ON o.orderID = op.orderID
+    LEFT JOIN Products p ON op.productID = p.productID
     WHERE 
-    DATE(o.orderDate) = '${orderDate}'
+        SUBSTRING(customerSchedule, ${orderDayOfWeek + 1}, 1) = '1' or o.orderDate = '${orderDate}'
     GROUP BY 
-    o.orderID, 
-    c.customerName, 
-    o.orderIsReturn, 
-    o.orderPO, 
-    o.orderTotal, 
-    o.orderChannel
-    ORDER BY 
-    o.orderID;
+        c.customerName,
+        c.customerIsMustCheck,
+        c.customerSchedule,
+        o.orderID
+    ORDER BY
+        CASE 
+            WHEN Status = 'Must Check' THEN 1
+            WHEN Status = 'Waiting' THEN 2
+            ELSE 3
+        END,
+        customerName;
     `;
-
-    /*const query = `
-    Select *
-    From Orders o
-    Where o.orderDate = ${orderDate};
-    `;*/
 
     connection.query(query, orderDate, (err, rows) => {
         if (err) {
@@ -624,6 +669,61 @@ ipcMain.on('get-order-from-date', async (event, data1, data2) => {
         }
     });
 });
+
+ipcMain.on('get-summary-from-date', async (event, data) => {
+
+    const orderDate = data;
+    // console.log('Summary:', orderDate);
+
+    let query = `
+    SELECT
+    SUM(CASE WHEN p.productName = '1.25oz Chips' THEN op.productQuantity ELSE 0 END) AS '1.25oz Chips',
+    SUM(CASE WHEN p.productName = '2.25oz Chips' THEN op.productQuantity ELSE 0 END) AS '2.25oz Chips',
+    SUM(CASE WHEN p.productName = '7.5oz Chips' THEN op.productQuantity ELSE 0 END) AS '7.5oz Chips',
+    SUM(CASE WHEN p.productName = '14oz Chips' THEN op.productQuantity ELSE 0 END) AS '14oz Chips',
+    SUM(CASE WHEN p.productName = 'Chocolate Bar' THEN op.productQuantity ELSE 0 END) AS 'Chocolate Bar',
+    SUM(CASE WHEN p.productName = 'Chocolate Box' THEN op.productQuantity ELSE 0 END) AS 'Chocolate Box'
+    FROM
+    Orders o
+    LEFT JOIN OrderProducts op ON o.orderID = op.orderID
+    LEFT JOIN Products p ON op.productID = p.productID
+    WHERE
+	o.orderIsReturn = 0 AND
+    o.orderDate = '${orderDate}';
+    `;
+
+    connection.query(query, orderDate, (err, rows) => {
+        if (err) {
+            // console.log(err.message);
+            event.reply('get-summary-from-date-error', err.message);
+        } else {
+            // console.log(rows);
+            event.reply('get-summary-from-date-success', rows);
+        }
+    });
+});
+
+ipcMain.on('get-sales-total-from-date', async (event, data) => {
+    let query = `
+    SELECT
+    SUM(o.orderTotal)
+    FROM
+    Orders o
+    WHERE
+	o.orderIsReturn = 0 AND
+    o.orderDate = '${orderDate}';
+    `;
+
+    connection.query(query, orderDate, (err, rows) => {
+        if (err) {
+            // console.log(err.message);
+            event.reply('get-sales-total-from-date-error', err.message);
+        } else {
+            // console.log(rows);
+            event.reply('get-sales-total-from-date-success', rows);
+        }
+    });    
+})
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {

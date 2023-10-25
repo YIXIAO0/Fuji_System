@@ -194,9 +194,9 @@ body {
   
 
 .table-display {
-    margin: 20px;
+    margin: 10px;
     width: auto;
-    height: 650px;
+    height: 700px;
     overflow: auto;
 }
 

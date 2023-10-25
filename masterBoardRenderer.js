@@ -240,6 +240,7 @@ function handleButtonClick(event) {
             changedRows.push({ processDate: processDateObj, company: company });
         }
     }
+    sales_summary = [0,0,0,0,0,0,0];
     createTable(sqldata);
 }
 

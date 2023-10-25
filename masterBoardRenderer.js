@@ -115,6 +115,9 @@ async function createTable(data) {
     const headerRow = tableHeader.insertRow();
 
     Object.keys(data[0]).forEach((key) => {
+        if (key === 'CompanyID' || key === 'OrderID'){
+            return;
+        }
         const th = document.createElement('th');
         th.textContent = key;
         headerRow.appendChild(th);
@@ -192,7 +195,9 @@ async function createTable(data) {
                 cell.classList.add('frequent-item');
                 cell.textContent = item[key];
             } else {
-                cell.textContent = item[key];
+                if (key !== 'CompanyID' && key !== 'OrderID'){
+                    cell.textContent = item[key];
+                }
             }
             for (let i = 0; i < productNames.length; i++) {
                 if (key === productNames[i]) {
@@ -256,21 +261,6 @@ function processRecentProducts(companyName) {
         ipcRenderer.once('get-company-recent-products-error', (event, error) => {
             reject(error);
         });
-        // function handleSuccess(event, result) {
-        //     resolve(result);
-        // }
-
-        // function handleError(event, error) {
-        //     reject(error);
-        // }
-
-        // // Attach the listeners
-        // ipcRenderer.once('get-company-recent-products-success', handleSuccess);
-        // ipcRenderer.once('get-company-recent-products-error', handleError);
-
-        // ipcRenderer.send('get-company-recent-products', companyName);
-        // ipcRenderer.removeListener('get-company-recent-products-success', handleSuccess);
-        // ipcRenderer.removeListener('get-company-recent-products-error', handleError);
     });
 }
 

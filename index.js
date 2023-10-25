@@ -736,9 +736,11 @@ ipcMain.on('get-order-from-date', async (event, data1, data2) => {
         WHEN customerIsMustCheck = 1 THEN 'Must Check'
         ELSE 'Waiting'
     END AS 'Status',
-        c.customerName AS 'Company',
-        orderIsReturn AS 'Type',
-        orderPO AS 'PO#', 
+        c.customerName AS Company,
+        c.customerID AS CompanyID,
+        o.orderID AS OrderID,
+        o.orderIsReturn AS Type,
+        o.orderPO AS PO_Number,
         MAX(CASE WHEN p.productName = '1.25oz Chips' THEN op.productQuantity END) AS '1.25oz Chips',
         MAX(CASE WHEN p.productName = '2.25oz Chips' THEN op.productQuantity END) AS '2.25oz Chips',
         MAX(CASE WHEN p.productName = '7.5oz Chips' THEN op.productQuantity END) AS '7.5oz Chips',
@@ -756,9 +758,12 @@ ipcMain.on('get-order-from-date', async (event, data1, data2) => {
         SUBSTRING(customerSchedule, ${orderDayOfWeek + 1}, 1) = '1' or o.orderDate = '${orderDate}'
     GROUP BY 
         c.customerName,
-        c.customerIsMustCheck,
-        c.customerSchedule,
-        o.orderID
+        c.customerID,
+        o.orderID,
+        o.orderIsReturn,
+        o.orderPO,
+        o.orderTotal,
+        o.orderChannel
     ORDER BY
         CASE 
             WHEN Status = 'Must Check' THEN 1

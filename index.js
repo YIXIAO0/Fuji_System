@@ -721,7 +721,7 @@ ipcMain.on('get-company-recent-products', async (event, data) => {
     GROUP BY o.orderDate, p.productName
     ) AS recentProducts
     GROUP BY productName
-    HAVING productCount >= 2;
+    HAVING productCount >= 3;
     `;
     connection.query(query, companyName, (err, rows) => {
         if (err) {

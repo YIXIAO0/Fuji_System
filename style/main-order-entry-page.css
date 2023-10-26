@@ -115,9 +115,10 @@ body {
 
 .search-bar {
     position: relative;  /* Establishes a positioning context for the search icon */
-    flex-grow: 1;        /* Allows the wrapper to grow and take up available space */
+    /* flex-grow: 1; */        /* Allows the wrapper to grow and take up available space */
     margin-right: 10px;  /* Adds some spacing between the input and the search button */
     margin-left: 20px;
+    height: 60px;
 }
 
 .customer-title {
@@ -233,8 +234,11 @@ table td:first-child {
 
 .contacts-table-unique {
     margin-top: 20px;
-    height: 150px;
-    width: 500px;
+    height: 200px;
+    /* width: 500px; */
+    max-width: 600px;
+    overflow-x: auto;
+    display: block;
 }
 
 .contacts-table-unique td, .contacts-table-unique th {

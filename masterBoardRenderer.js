@@ -148,7 +148,7 @@ async function createTable(data) {
         const formattedDateObj = new Date(formattedDate);
         // let loadChangedRows = loadChangedRows();
         // const isChangedRow = loadChangedRows.some(row => row.processDate.getTime() === processDateObj.getTime() && row.company === item['Company']);
-        console.log(changedRows);
+        // console.log(changedRows);
         // const isChangedRow = changedRows.some(row => row.processDate.getTime() === processDateObj.getTime() && row.company === item['Company']);
         const isChangedRow = changedRows.some(row => {
             const processDate = new Date(row.processDate);

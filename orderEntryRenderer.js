@@ -99,6 +99,7 @@
         // Search bar within the left section
         const searchBar = document.createElement('div');
         searchBar.classList.add('search-bar');
+        // searchBar.style.height = '60px';
 
         const customerTitleSpan = document.createElement('span');
         customerTitleSpan.classList.add('customer-title');
@@ -592,6 +593,8 @@
     });
 
     function displayContactResults(contacts, contactInfoSection){
+
+        console.log(contacts);
         // Create a table element
         contactInfoSection.innerHTML = '';
         const table = document.createElement('table');
@@ -614,12 +617,25 @@
             const tr = document.createElement('tr');
             const name = contact.contactName;
             const values = [name, formatNumber(contact.contactPhone), contact.contactEmail];
+            // console.log(contact.contactInfo);
             values.forEach(value => {
                 const td = document.createElement('td');
                 td.textContent = value;
                 tr.appendChild(td);
             });
+            // tbody.appendChild(tr);
+            // const tdNote = document.createElement('td'); // Empty cell for the 'Note' column
+            // tr.appendChild(tdNote);
             tbody.appendChild(tr);
+    
+            // Additional row for 'contactNotes'
+            const noteTr = document.createElement('tr');
+            const tdNoteContent = document.createElement('td');
+            tdNoteContent.textContent = contact.contactNotes;
+            tdNoteContent.setAttribute('colspan', '3'); // Span across all 3 columns
+            tdNoteContent.style.fontWeight = 'normal';
+            noteTr.appendChild(tdNoteContent);
+            tbody.appendChild(noteTr);
         });
         table.appendChild(tbody);
 
@@ -717,12 +733,23 @@
                 tdProduct.textContent = product;
                 tr.appendChild(tdProduct);
             
+                let daysCounter = 0;
+
                 uniqueDates.forEach(date => {
                     const td = document.createElement('td');
-                    td.textContent = (organizedData[product] && organizedData[product][date]) || ''; // If no quantity, display empty
+                    if (organizedData[product] && organizedData[product][date]) {
+                        td.textContent = organizedData[product][date];
+                        daysCounter++;
+                    } else {
+                        td.textContent = '';
+                    }
+                    // td.textContent = (organizedData[product] && organizedData[product][date]) || ''; // If no quantity, display empty
                     tr.appendChild(td);
                 });
-            
+                
+                if (daysCounter >= 3) {
+                    tdProduct.style.backgroundColor = '#fde19e';
+                }
                 tbody.appendChild(tr);
             });
             orderPurchaseHistorySection.appendChild(table);

@@ -207,6 +207,9 @@ async function createTable(data) {
                 cell.classList.add('frequent-item');
                 cell.textContent = item[key];
             } else {
+                // if (key !== 'CompanyID' && key !== 'OrderID'){
+                //     cell.textContent = item[key];
+                // }
                 cell.textContent = item[key];
             }
             for (let i = 0; i < productNames.length; i++) {

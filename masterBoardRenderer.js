@@ -4,6 +4,22 @@ const { ipcRenderer} = require('electron');
 const { EventEmitter } = require('events');
 EventEmitter.defaultMaxListeners = 300;
 
+const Store = require('electron-store');
+const store = new Store();
+// store.clear();
+
+// Function to load changed rows from the store
+function loadChangedRows() {
+    let loadChangedRows = store.get('changedRows', []);
+    // console.log(loadChangedRows);
+    return loadChangedRows; // Return an empty array if there's no data
+  }
+  
+  // Function to save changed rows to the store
+function saveChangedRows(rows) {
+    store.set('changedRows', rows);
+}
+
 var today = new Date();
 
 // Set default date to tomorrow
@@ -15,7 +31,7 @@ var mm = String(tomorrow.getMonth() + 1).padStart(2, '0');
 var dd = String(tomorrow.getDate()).padStart(2, '0');
 var formattedDate = yyyy + '-' + mm + '-' + dd;
 var processDate = formattedDate;
-let changedRows = [];
+let changedRows = loadChangedRows();
 var sqldata = [];
 
 // Set the default value of the date input to tomorrow's date
@@ -130,9 +146,15 @@ async function createTable(data) {
         // Convert the stored dates to JavaScript Date objects for comparison
         const processDateObj = new Date(processDate);
         const formattedDateObj = new Date(formattedDate);
-        
-        const isChangedRow = changedRows.some(row => row.processDate.getTime() === processDateObj.getTime() && row.company === item['Company']);
-
+        // let loadChangedRows = loadChangedRows();
+        // const isChangedRow = loadChangedRows.some(row => row.processDate.getTime() === processDateObj.getTime() && row.company === item['Company']);
+        console.log(changedRows);
+        // const isChangedRow = changedRows.some(row => row.processDate.getTime() === processDateObj.getTime() && row.company === item['Company']);
+        const isChangedRow = changedRows.some(row => {
+            const processDate = new Date(row.processDate);
+            return processDate.getTime() === processDateObj.getTime() && row.company === item['Company'];
+        });
+          
         if (isChangedRow) {
             item['Status'] = 'No Order';
         } else if (processDateObj < formattedDateObj && (item['Status'] === 'Must Check' || item['Status'] === 'Waiting')) {
@@ -187,11 +209,16 @@ async function createTable(data) {
                 cell.appendChild(btn);
             } else if (key === 'Company') {
                 // cell.classList.add();
+                const scrollDiv = document.createElement('div');
+                scrollDiv.classList.add('scrollable-company-cell');
+                scrollDiv.textContent = item[key];
+                cell.appendChild(scrollDiv);            
+
                 if (item['Status'] === 'Waiting' || item['Status'] === 'Must Check') {
                     cell.classList.add('display-table-row');
                     cell.setAttribute('data-display-row',JSON.stringify(item));
                 }
-                cell.textContent = item[key];
+                // cell.textContent = item[key];
             } else if (key === 'Type') {
                 if (item[key] === 0) {
                     cell.textContent = 'Purchase';
@@ -273,6 +300,7 @@ function handleButtonClick(event) {
             event.target.textContent = 'No Order';
             event.target.className = 'status-button no-order';
             changedRows.push({ processDate: processDateObj, company: company });
+            store.set('changedRows', changedRows);
         }
     }
     sales_summary = [0,0,0,0,0,0,0];

@@ -3,6 +3,9 @@ const connection = require('./database'); // Connect the database
 const productSearchHandler = require('./productSearchHandler'); // Product Search Handler
 const customerSearchHandler = require('./customerSearchHandler'); // Customer Search Handler
 const { eventNames } = require('process');
+const ElectronStore = require('electron-store');
+ElectronStore.initRenderer();
+
 let mainWindow;
 app.on('ready', () => {
     mainWindow = new BrowserWindow({
@@ -20,7 +23,8 @@ app.on('ready', () => {
         console.error("Failed to load:", errorCode, errorDescription);
     });
     
-    mainWindow.loadFile('productSearchPage.html');
+    // mainWindow.loadFile('productSearchPage.html');
+    mainWindow.loadFile('masterBoardPage.html');
 
     mainWindow.webContents.on('did-finish-load', () => {
         connection.query('SELECT * FROM Products', (err, results) => {
@@ -31,6 +35,8 @@ app.on('ready', () => {
             }
         });
     });
+
+    
 
     // IPC listeners for managing orderEntryPage windows:
 

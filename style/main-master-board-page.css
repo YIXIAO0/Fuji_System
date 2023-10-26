@@ -94,7 +94,16 @@ body {
     margin-bottom: 10px; 
 } */
   
-
+.date-selection {
+    margin-left: 40px;
+    height: 40px;
+    font-size: 20px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-bottom: 5px;
+}
   
 .search-input {
     /* width: 36%;  
@@ -112,7 +121,7 @@ body {
     border-radius: 12px;
     padding-left: 5px;
     padding-right: 5px;    
-    margin-bottom: 5px;;
+    margin-bottom: 5px; 
 }
 
 .search-input::placeholder {
@@ -157,16 +166,6 @@ body {
     align-items: center;
 }
 
-.date-selection {
-    margin-left: 40px;
-    height: 40px;
-    font-size: 20px;
-    border: 1px solid #ccc;
-    border-radius: 12px;
-    padding-left: 5px;
-    padding-right: 5px;
-}
-
 /* Modify the summary-display table styling */
 .summary-display {
     flex: 2;
@@ -195,11 +194,30 @@ body {
 
 .table-display {
     margin: 10px;
-    width: auto;
+    /* width: auto; */
+    max-width: 1200px;
     height: 700px;
     overflow: auto;
 }
 
+/* .table-display td {
+    vertical-align: top;
+} */
+
+.scrollable-company-cell {
+    max-width: 150px;  /* Set to your desired max width */
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.scrollable-company-cell::-webkit-scrollbar {
+    height: 0;
+    width: 0; /* Adjust the width to 0 */
+}
+
+.scrollable-company-cell::-webkit-scrollbar-thumb {
+    background-color: transparent; /* Make the scrollbar thumb transparent */
+}
 
 
 /*.table-display th,

@@ -15,6 +15,7 @@
     "dotenv": "^16.3.1",
     "electron": "^27.0.2",
     "electron-reload": "^2.0.0-alpha.1",
+    "electron-store": "^8.1.0",
     "mysql": "^2.18.1",
     "mysql2": "^3.6.1",
     "plotly.js": "^2.26.2",

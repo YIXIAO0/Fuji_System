@@ -69,10 +69,10 @@ app.on('ready', () => {
 ipcMain.on('navigate', (event, page) => {
     mainWindow.loadFile(page)
     .then(() => {
-    console.log('Success loading HTML file');
+        console.log('Success loading HTML file');
     })
     .catch((error) => {
-    console.error('Error loading HTML file:', error);
+        console.error('Error loading HTML file:', error);
     })
 });
 

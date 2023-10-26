@@ -216,7 +216,10 @@ async function createTable(data) {
 
                 if (item['Status'] === 'Waiting' || item['Status'] === 'Must Check') {
                     cell.classList.add('display-table-row');
-                    cell.setAttribute('data-display-row',JSON.stringify(item));
+                    cell.setAttribute('data-display-row', JSON.stringify(item));
+                } else if (item['Status' === 'Ordered']){
+                    cell.classList.add('modify-order-row');
+                    cell.setAttribute('data-modify-row', JSON.stringify(item));
                 }
                 // cell.textContent = item[key];
             } else if (key === 'Type') {
@@ -286,6 +289,13 @@ document.addEventListener('click', (event) => {
             const displayData = JSON.parse(row.getAttribute('data-display-row'));
             // Sending the product data to the main process to open the product details page
             ipcRenderer.send('open-display-row', displayData);
+        }
+    } else if (event.target.closest('td.modify-order-row')){
+        let row = event.target.closest('td.modify-order-row');
+        if (row) {
+            event.preventDefault();
+            const displayData = JSON.parse(row.getAttribute('data-modify-row'));
+            ipcRenderer.send('modify-display-row', displayData);
         }
     }
 });

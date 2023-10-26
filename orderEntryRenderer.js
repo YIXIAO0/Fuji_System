@@ -19,6 +19,12 @@
         currDisplayData = displayData;
     });
 
+    ipcRenderer.on('display-modify-row-data', (event, displayData) => {
+        populateOrderEntryPage(displayData);
+        currDisplayData = displayData;
+        console.log(displayData);
+    });
+
     function addOrderEntryButton(count) {
         const button = document.createElement('button');
         button.innerHTML = `Order ${count} <img src='./image/x-button.png' class='close-icon'>`;

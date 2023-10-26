@@ -137,6 +137,18 @@ ipcMain.on('open-display-row', (event, data) => {
     mainWindow.loadFile('orderEntryPage.html');
 });
 
+ipcMain.on('modify-display-row', (event, data) => {
+    mainWindow.webContents.once('did-fail-load', (event, errorCode, errorDescription) => {
+        console.error("Failed to load:", errorCode, errorDescription);
+    });
+
+    mainWindow.webContents.once('did-finish-load', () => {
+        mainWindow.webContents.send('display-modify-row-data', data);
+    });
+
+    mainWindow.loadFile('orderEntryPage.html');
+});
+
 // Listen for the customer search request from the renderer
 ipcMain.on('perform-customer-search', (event, searchQuery, count) => {
     customerSearchHandler.handleSearch(searchQuery, connection)

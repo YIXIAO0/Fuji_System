@@ -118,7 +118,6 @@ document.addEventListener('click', (event) => {
 });
 
 // Navigation logic for the left panel buttons
-console.log('DOMContentLoaded event fired');
 document.addEventListener('DOMContentLoaded', function() {
     const buttons = document.querySelectorAll(".left-panel .panel-button");
     // Event listener to adjust the 'active' class

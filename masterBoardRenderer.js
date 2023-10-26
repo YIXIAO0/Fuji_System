@@ -2,7 +2,7 @@ const { create } = require('domain');
 const { ipcRenderer} = require('electron');
 // const { dialog } = require('electron');
 const { EventEmitter } = require('events');
-EventEmitter.defaultMaxListeners = 200;
+EventEmitter.defaultMaxListeners = 300;
 
 var today = new Date();
 
@@ -247,14 +247,19 @@ document.addEventListener('click', function(event) {
 });
 
 document.addEventListener('click', (event) => {
-    // Check if the clicked element is within a product row with class "product-table-row"
-    let row = event.target.closest('td.display-table-row');
-    if (row) {
-        event.preventDefault();
-        // Extract the product data from the row's data-product attribute
-        const displayData = JSON.parse(row.getAttribute('data-display-row'));
-        // Sending the product data to the main process to open the product details page
-        ipcRenderer.send('open-display-row', displayData);
+    if (event.target.matches('.status-button')) {
+        console.log("Status button clicked");
+        handleButtonClick(event);
+    } else if (event.target.closest('td.display-table-row')){
+        // Check if the clicked element is within a product row with class "product-table-row"
+        let row = event.target.closest('td.display-table-row');
+        if (row) {
+            event.preventDefault();
+            // Extract the product data from the row's data-product attribute
+            const displayData = JSON.parse(row.getAttribute('data-display-row'));
+            // Sending the product data to the main process to open the product details page
+            ipcRenderer.send('open-display-row', displayData);
+        }
     }
 });
 
@@ -279,15 +284,21 @@ function processRecentProducts(companyName) {
     return new Promise((resolve, reject) => {
         ipcRenderer.send('get-company-recent-products', companyName);
 
-        ipcRenderer.once('get-company-recent-products-success', (event, result) => {
+        function onSuccess(event, result) {
+            ipcRenderer.removeListener('get-company-recent-products-error', onError);
             resolve(result);
-        });
+        }
 
-        ipcRenderer.once('get-company-recent-products-error', (event, error) => {
+        function onError(event, error) {
+            ipcRenderer.removeListener('get-company-recent-products-success', onSuccess);
             reject(error);
-        });
+        }
+
+        ipcRenderer.once('get-company-recent-products-success', onSuccess);
+        ipcRenderer.once('get-company-recent-products-error', onError);
     });
 }
+
 
 // Function to filter table rows based on search query
 function filterTable(searchQuery) {

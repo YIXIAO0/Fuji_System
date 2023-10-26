@@ -5,12 +5,18 @@
     let orderEntryCount = 0;
     let selectedCustomerID = null;
     let searchTimeout;
+    let currDisplayData = null;
 
     document.getElementById('addNewEntry').addEventListener('click', function() {
         orderEntryCount++;
         addOrderEntryButton(orderEntryCount);
         addOrderEntrySection(orderEntryCount);
         navigateToSection(orderEntryCount);
+    });
+
+    ipcRenderer.on('display-row-data', (event, displayData) => {
+        populateOrderEntryPage(displayData);
+        currDisplayData = displayData;
     });
 
     function addOrderEntryButton(count) {
@@ -26,17 +32,25 @@
                     button.remove();
                 }
             } else {
-                const currentSection = document.getElementById(`mainSection${count}`);
-                const searchInput = currentSection.querySelector('.search-input');
-                const resultsContainer = currentSection.querySelector('.results-container');
-
-                attachSearchEventListener(count, searchInput, resultsContainer); // Attach the event listener dynamically
+                // const currentSection = document.getElementById(`mainSection${count}`);
+                // const searchInput = currentSection.querySelector('.search-input');
+                // const resultsContainer = currentSection.querySelector('.results-container');
+                // attachSearchEventListener(count, searchInput, resultsContainer); // Attach the event listener dynamically
                 navigateToSection(count);
             }
         });
 
         const container = document.getElementById('buttonContainer');
         container.insertBefore(button, container.firstChild);
+    }
+
+    function populateOrderEntryPage(displayData) {
+        // Populate the search input and trigger the event
+        const searchInput = document.querySelector('.search-input'); // Adjust selector as needed
+        if (searchInput) {
+            searchInput.value = displayData.Company;
+            searchInput.dispatchEvent(new Event('input'));
+        }
     }
 
     function removeOrderEntrySection(count) {
@@ -179,6 +193,12 @@
                     }
                 }, 300);
             });
+
+             // Check if currDisplayData is not null and populate the search input
+            if (currDisplayData && currDisplayData.Company) {
+                searchInput.value = currDisplayData.Company;
+                searchInput.dispatchEvent(new Event('input')); // Trigger the input event programmatically
+            }
         }
     }
 
@@ -494,43 +514,63 @@
 
     function displayResults(customers, count, searchInput, resultsContainer, searchBar) {
         resultsContainer.innerHTML = '';
+        let matchingItem = null;
         customers.forEach(customer => {
             const item = document.createElement('div');
             item.classList.add('result-item');
             item.textContent = customer.customerName;
-
-            // Add an event listener to hide the results container when clicked
+    
+            // Adding a property to track if the item has been clicked
+            item.clicked = false;
+    
+            // Check if this customer matches the one in currDisplayData
+            if (currDisplayData && customer.customerName === currDisplayData.Company) {
+                matchingItem = item; // Store the matching item
+            }
+    
+            // Add an event listener for the item
             item.addEventListener('click', function() {
-                selectedCustomerID = customer.customerID;
-                // Handle the customer selection
-                searchInput.value = customer.customerName;
-                resultsContainer.style.display = 'none';  // Hide the container
-                let isActive = customer.customerIsActive === 1;
-
-                // Create the button or select it if it already exists
-                let statusButton = document.createElement('button');
-                statusButton.id = 'statusButton';
-                statusButton.textContent = isActive ? 'Active' : 'Inactive';
-
-                // Apply the appropriate class based on the customer's active status
-                statusButton.className = isActive ? 'button-active' : 'button-inactive';
-
-                // Append the button to the desired container (assuming it's next to the search input)
-                let span = document.createElement('span');
-                span.classList.add("status-title");
-                span.textContent = 'Status:';
-                searchBar.appendChild(span);
-                searchBar.appendChild(statusButton);
-                const customerID = customer.customerID;
-                ipcRenderer.send('get-contacts-for-order-company', customerID, count);
-                ipcRenderer.send('get-info-for-order-company', customerID, count);
-                ipcRenderer.send('perform-order-history-search-for-customer', customerID, count);
+                if (!item.clicked) {
+                    selectedCustomerID = customer.customerID;
+                    // Handle the customer selection
+                    searchInput.value = customer.customerName;
+                    resultsContainer.style.display = 'none';  // Hide the container
+                    let isActive = customer.customerIsActive === 1;
+    
+                    // Create the button or select it if it already exists
+                    let statusButton = document.createElement('button');
+                    statusButton.id = 'statusButton';
+                    statusButton.textContent = isActive ? 'Active' : 'Inactive';
+    
+                    // Apply the appropriate class based on the customer's active status
+                    statusButton.className = isActive ? 'button-active' : 'button-inactive';
+    
+                    // Append the button to the desired container (assuming it's next to the search input)
+                    let span = document.createElement('span');
+                    span.classList.add("status-title");
+                    span.textContent = 'Status:';
+                    searchBar.appendChild(span);
+                    searchBar.appendChild(statusButton);
+                    const customerID = customer.customerID;
+                    ipcRenderer.send('get-contacts-for-order-company', customerID, count);
+                    ipcRenderer.send('get-info-for-order-company', customerID, count);
+                    ipcRenderer.send('perform-order-history-search-for-customer', customerID, count);
+    
+                    // Mark the item as clicked
+                    item.clicked = true;
+                }
             });
             resultsContainer.appendChild(item);
         });
-
+    
         resultsContainer.style.display = customers.length ? 'block' : 'none';
+    
+        // Trigger a click on the matching item if it exists and hasn't been clicked
+        if (matchingItem && !matchingItem.clicked) {
+            matchingItem.click();
+        }
     }
+    
 
     ipcRenderer.on('get-contacts-for-order-company-success', (event, contacts, count) => {
         const currentSection = document.getElementById(`mainSection${count}`);

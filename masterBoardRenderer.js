@@ -156,7 +156,12 @@ async function createTable(data) {
 
     for (const item of data) {
         const row = tableBody.insertRow();
+        // row.classList.add('display-table-row');
+        // row.setAttribute('data-display-row',JSON.stringify(item));
         for (const key in item) {
+            if (key === 'CompanyID' || key === 'OrderID'){
+                continue;
+            }
             const cell = row.insertCell();
             const recentProducts = await processRecentProducts(item['Company']);
             if (key === 'Status') {
@@ -180,6 +185,13 @@ async function createTable(data) {
                         break;
                 }
                 cell.appendChild(btn);
+            } else if (key === 'Company') {
+                // cell.classList.add();
+                if (item['Status'] === 'Waiting' || item['Status'] === 'Must Check') {
+                    cell.classList.add('display-table-row');
+                    cell.setAttribute('data-display-row',JSON.stringify(item));
+                }
+                cell.textContent = item[key];
             } else if (key === 'Type') {
                 if (item[key] === 0) {
                     cell.textContent = 'Purchase';
@@ -195,9 +207,7 @@ async function createTable(data) {
                 cell.classList.add('frequent-item');
                 cell.textContent = item[key];
             } else {
-                if (key !== 'CompanyID' && key !== 'OrderID'){
-                    cell.textContent = item[key];
-                }
+                cell.textContent = item[key];
             }
             for (let i = 0; i < productNames.length; i++) {
                 if (key === productNames[i]) {
@@ -230,6 +240,18 @@ document.addEventListener('click', function(event) {
     if (event.target.matches('.status-button')) {
         console.log("Status button clicked");
         handleButtonClick(event);
+    }
+});
+
+document.addEventListener('click', (event) => {
+    // Check if the clicked element is within a product row with class "product-table-row"
+    let row = event.target.closest('td.display-table-row');
+    if (row) {
+        event.preventDefault();
+        // Extract the product data from the row's data-product attribute
+        const displayData = JSON.parse(row.getAttribute('data-display-row'));
+        // Sending the product data to the main process to open the product details page
+        ipcRenderer.send('open-display-row', displayData);
     }
 });
 

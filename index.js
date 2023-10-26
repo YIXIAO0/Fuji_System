@@ -118,6 +118,18 @@ ipcMain.on('open-customer-details', (event, customerData) => {
     mainWindow.loadFile('customerDetails.html');
 });
 
+ipcMain.on('open-display-row', (event, data) => {
+    mainWindow.webContents.once('did-fail-load', (event, errorCode, errorDescription) => {
+        console.error("Failed to load:", errorCode, errorDescription);
+    });
+    
+    mainWindow.webContents.once('did-finish-load', () => {
+        // Once the file is loaded, send the product data to the renderer
+        mainWindow.webContents.send('display-row-data', data);
+    });
+
+    mainWindow.loadFile('orderEntryPage.html');
+});
 
 // Listen for the customer search request from the renderer
 ipcMain.on('perform-customer-search', (event, searchQuery, count) => {
@@ -740,7 +752,7 @@ ipcMain.on('get-order-from-date', async (event, data1, data2) => {
         c.customerID AS CompanyID,
         o.orderID AS OrderID,
         o.orderIsReturn AS Type,
-        o.orderPO AS PO_Number,
+        o.orderPO AS 'PO#',
         MAX(CASE WHEN p.productName = '1.25oz Chips' THEN op.productQuantity END) AS '1.25oz Chips',
         MAX(CASE WHEN p.productName = '2.25oz Chips' THEN op.productQuantity END) AS '2.25oz Chips',
         MAX(CASE WHEN p.productName = '7.5oz Chips' THEN op.productQuantity END) AS '7.5oz Chips',

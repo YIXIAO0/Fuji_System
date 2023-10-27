@@ -217,7 +217,7 @@ async function createTable(data) {
                 if (item['Status'] === 'Waiting' || item['Status'] === 'Must Check') {
                     cell.classList.add('display-table-row');
                     cell.setAttribute('data-display-row', JSON.stringify(item));
-                } else if (item['Status' === 'Ordered']){
+                } else if (item['Status'] === 'Ordered'){
                     cell.classList.add('modify-order-row');
                     cell.setAttribute('data-modify-row', JSON.stringify(item));
                 }
@@ -268,13 +268,6 @@ function getStatusPriority(status) {
         default: return 5;
     }
 }
-
-document.addEventListener('click', function(event) {
-    if (event.target.matches('.status-button')) {
-        console.log("Status button clicked");
-        handleButtonClick(event);
-    }
-});
 
 document.addEventListener('click', (event) => {
     if (event.target.matches('.status-button')) {

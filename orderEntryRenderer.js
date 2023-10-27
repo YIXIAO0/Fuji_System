@@ -6,23 +6,20 @@
     let selectedCustomerID = null;
     let searchTimeout;
     let currDisplayData = null;
+    let currUpdateData = false;
 
     document.getElementById('addNewEntry').addEventListener('click', function() {
-        orderEntryCount++;
-        addOrderEntryButton(orderEntryCount);
-        addOrderEntrySection(orderEntryCount);
-        navigateToSection(orderEntryCount);
+        if (!currUpdateData && !currDisplayData){
+            orderEntryCount++;
+            addOrderEntryButton(orderEntryCount);
+            addOrderEntrySection(orderEntryCount);
+            navigateToSection(orderEntryCount);
+        }
     });
 
     ipcRenderer.on('display-row-data', (event, displayData) => {
         populateOrderEntryPage(displayData);
         currDisplayData = displayData;
-    });
-
-    ipcRenderer.on('display-modify-row-data', (event, displayData) => {
-        populateOrderEntryPage(displayData);
-        currDisplayData = displayData;
-        console.log(displayData);
     });
 
     function addOrderEntryButton(count) {
@@ -56,6 +53,9 @@
         if (searchInput) {
             searchInput.value = displayData.Company;
             searchInput.dispatchEvent(new Event('input'));
+
+            // Set the search input to readonly
+            searchInput.readOnly = true;
         }
     }
 
@@ -201,7 +201,7 @@
                 }, 300);
             });
 
-             // Check if currDisplayData is not null and populate the search input
+            // Check if currDisplayData is not null and populate the search input
             if (currDisplayData && currDisplayData.Company) {
                 searchInput.value = currDisplayData.Company;
                 searchInput.dispatchEvent(new Event('input')); // Trigger the input event programmatically
@@ -257,6 +257,7 @@
         channelsLabel.textContent = 'Channel' + '\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0';
         channelsLabel.style.fontWeight = 'bold';
         const channelSelectionDiv = document.createElement('div');
+        channelSelectionDiv.id = 'channelSelectionDiv';
         // channelSelectionDiv.classList.add('channel-selection');
         channelSelectionDiv.appendChild(channelsLabel);
         channels.forEach(channel => {
@@ -288,6 +289,7 @@
         typesLabel.style.fontWeight = 'bold';
         const typeSelectionDiv = document.createElement('div');
         typeSelectionDiv.appendChild(typesLabel);
+        typeSelectionDiv.id = 'typeSelectionDiv';
         // typeSelectionDiv.classList.add('type-selection');
         types.forEach(type => {
             const button = document.createElement('button');
@@ -490,7 +492,19 @@
 
             table.appendChild(tbody);
             orderEntrySection.appendChild(table);
+            setupEventListener(orderEntrySection);
         });
+
+        function setupEventListener(orderEntrySection) {
+            ipcRenderer.on('display-modify-row-data', (event, displayData) => {
+                populateOrderEntryPage(displayData);
+                currDisplayData = displayData;
+                updateInputValues(orderEntrySection);
+                updateChannelAndTypeSelections(orderEntrySection);
+                updateSales();
+                currUpdateData = true;
+            });
+        }
 
         function adjustQuantity(tdQuantity, adjustment) {
             const input = tdQuantity.querySelector('input');
@@ -517,6 +531,51 @@
             const tdTotal = tbody.querySelector('.order-total-row td:nth-child(3)');
             tdTotal.textContent = '$' + totalSales.toFixed(2);
         }
+    }
+
+    function updateInputValues(orderEntrySection) {
+        const tableRows = orderEntrySection.querySelectorAll('#orderEntryTable tbody tr'); // Adjust the selector as needed
+        tableRows.forEach(row => {
+            const productNameCell = row.cells[0]; // Assuming the product name is in the first cell
+            const productName = productNameCell.textContent;
+            const inputCell = row.cells[1]; // Assuming the input is in the second cell
+            const input = inputCell.querySelector('input[type="number"]');
+            if (input && currDisplayData && currDisplayData[productName]) {
+                input.value = currDisplayData[productName];
+            }
+        });
+    }
+
+    function updateChannelAndTypeSelections(orderEntrySection) {
+        if (!currDisplayData) return;
+    
+        const channelButtons = orderEntrySection.querySelectorAll('#channelSelectionDiv .channel-button');
+        channelButtons.forEach(button => {
+            if (button.textContent === currDisplayData.Channel) {
+                button.classList.add('selected');
+            } else {
+                button.classList.remove('selected');
+            }
+        });
+    
+        const typeButtons = orderEntrySection.querySelectorAll('#typeSelectionDiv .type-button');
+        typeButtons.forEach(button => {
+            if (button.textContent === 'Purchase'){
+                if (currDisplayData.Type === 0){
+                    button.classList.add('selected');
+                }else {
+                    button.classList.remove('selected');
+                }
+            }
+
+            if (button.textContent === 'Replace'){
+                if (currDisplayData.Type === 1){
+                    button.classList.add('selected');
+                }else {
+                    button.classList.remove('selected');
+                }
+            }
+        });
     }
 
     function displayResults(customers, count, searchInput, resultsContainer, searchBar) {
@@ -599,8 +658,6 @@
     });
 
     function displayContactResults(contacts, contactInfoSection){
-
-        console.log(contacts);
         // Create a table element
         contactInfoSection.innerHTML = '';
         const table = document.createElement('table');
@@ -823,18 +880,83 @@
     }
 
     function handleSubmit(orderEntrySection, customerID){
-        const selectedValues = getSelectedValues(orderEntrySection);
-        
-        // Use the getLastOrderID function
-        getLastOrderID((error, lastOrderID) => {
-            if (error) {
-                console.error("Error retrieving the last OrderID:", error);
-            } else {
-                let orderID = lastOrderID + 1;
+        if (!currUpdateData){
+            const selectedValues = getSelectedValues(orderEntrySection);
+            // Use the getLastOrderID function
+            getLastOrderID((error, lastOrderID) => {
+                if (error) {
+                    console.error("Error retrieving the last OrderID:", error);
+                } else {
+                    let orderID = lastOrderID + 1;
+                    const orderData = {
+                        orderID: orderID,
+                        invoiceID: orderID + 34000,
+                        customerID: customerID,
+                        orderDate: selectedValues.date,
+                        orderTotal: calculateOrderTotal(selectedValues.productInfo),
+                        orderIsReturn: selectedValues.type === "Replace" ? 1 : 0,
+                        orderChannel: selectedValues.channel,
+                        orderStatus: "Received",
+                        orderPO: selectedValues.poNumber
+                    }
+                    ipcRenderer.send('insert-order', orderData);
+                    //console.log(orderData);
+                    ipcRenderer.on('insert-order-reply', (event, message) => {
+                        console.log(message);  // This will either be a success or error message.
+                    });
+
+                    selectedValues.productInfo.forEach((product, index) => {
+                        if (product.quantity === 0){
+                            return;
+                        }
+                        const orderProductData = {
+                            orderID: orderID,
+                            productID: index + 1,
+                            productQuantity: product.quantity
+                        };
+                        ipcRenderer.send('insert-order-product', orderProductData);
+                        // console.log(orderProductData);
+                    });
+                    ipcRenderer.on('insert-order-product-reply', (event, message) => {
+                        console.log(message);
+                    });
+                }
+            });
+        } else {
+            // Set up listeners once, outside your function
+            ipcRenderer.on('delete-order-reply', (event, message) => {
+                console.log("Delete Order Reply:", message);
+                // Handle deletion response
+            });
+
+            ipcRenderer.on('insert-order-reply', (event, message) => {
+                console.log("Insert Order Reply:", message);
+                // Handle insert order response
+            });
+
+            ipcRenderer.on('insert-order-product-reply', (event, message) => {
+                console.log("Insert Order Product Reply:", message);
+                // Handle insert order product response
+            });
+
+            function processOrder(orderEntrySection) {
+                const selectedValues = getSelectedValues(orderEntrySection);
+                let orderID = currDisplayData['OrderID'];
+
+                // Step 1: Delete existing order
+                ipcRenderer.once('delete-order-reply', (event, message) => {
+                    console.log(message);
+                    // Proceed with insertion only after successful deletion
+                    insertNewOrder(orderID, selectedValues);
+                });
+                ipcRenderer.send('delete-order', orderID);
+            }
+
+            function insertNewOrder(orderID, selectedValues) {
                 const orderData = {
                     orderID: orderID,
                     invoiceID: orderID + 34000,
-                    customerID: customerID,
+                    customerID: currDisplayData['CompanyID'],
                     orderDate: selectedValues.date,
                     orderTotal: calculateOrderTotal(selectedValues.productInfo),
                     orderIsReturn: selectedValues.type === "Replace" ? 1 : 0,
@@ -842,11 +964,8 @@
                     orderStatus: "Received",
                     orderPO: selectedValues.poNumber
                 }
+
                 ipcRenderer.send('insert-order', orderData);
-                //console.log(orderData);
-                ipcRenderer.on('insert-order-reply', (event, message) => {
-                    console.log(message);  // This will either be a success or error message.
-                });
 
                 selectedValues.productInfo.forEach((product, index) => {
                     if (product.quantity === 0){
@@ -858,13 +977,10 @@
                         productQuantity: product.quantity
                     };
                     ipcRenderer.send('insert-order-product', orderProductData);
-                    // console.log(orderProductData);
-                });
-                ipcRenderer.on('insert-order-product-reply', (event, message) => {
-                    console.log(message);
                 });
             }
-        });
+            processOrder(orderEntrySection);
+        }
     }
 
     function calculateOrderTotal(productInfo) {

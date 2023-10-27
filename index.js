@@ -852,6 +852,58 @@ ipcMain.on('insert-order-product', (event, data) => {
     });
 });
 
+ipcMain.on('delete-order', (event, orderID) => {
+    // Start a transaction to ensure both deletions are successful
+    connection.beginTransaction(function(err) {
+        if (err) {
+            console.error('Error starting transaction:', err);
+            event.reply('delete-order-reply', 'Error starting transaction.');
+            return;
+        }
+
+        // First, delete from OrderProducts table
+        const deleteOrderProductsQuery = `
+            DELETE FROM OrderProducts WHERE orderID = ?
+        `;
+        connection.query(deleteOrderProductsQuery, [orderID], function(err) {
+            if (err) {
+                console.error('Error deleting data from OrderProducts table:', err);
+                // Rollback transaction on error
+                connection.rollback();
+                event.reply('delete-order-reply', 'Error deleting from OrderProducts table.');
+                return;
+            }
+
+            // Next, delete from Orders table
+            const deleteOrdersQuery = `
+                DELETE FROM Orders WHERE orderID = ?
+            `;
+            connection.query(deleteOrdersQuery, [orderID], function(err) {
+                if (err) {
+                    console.error('Error deleting data from Orders table:', err);
+                    // Rollback transaction on error
+                    connection.rollback();
+                    event.reply('delete-order-reply', 'Error deleting from Orders table.');
+                    return;
+                }
+
+                // Commit transaction
+                connection.commit(function(err) {
+                    if (err) {
+                        console.error('Error committing transaction:', err);
+                        connection.rollback();
+                        event.reply('delete-order-reply', 'Error during transaction commit.');
+                        return;
+                    }
+
+                    console.log(`Order and related products deleted`);
+                    event.reply('delete-order-reply', 'Successfully deleted order and related products.');
+                });
+            });
+        });
+    });
+});
+
 
 
 ipcMain.on('get-summary-from-date', async (event, data) => {

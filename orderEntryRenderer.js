@@ -880,6 +880,14 @@
     }
 
     function handleSubmit(orderEntrySection, customerID){
+
+        function onOperationComplete() {
+            // Check the condition and navigate if necessary
+            if (currDisplayData !== null) {
+                ipcRenderer.send('navigate', 'masterBoardPage.html');
+            }
+        }
+
         if (!currUpdateData){
             const selectedValues = getSelectedValues(orderEntrySection);
             // Use the getLastOrderID function
@@ -922,6 +930,7 @@
                     });
                 }
             });
+            onOperationComplete();
         } else {
             // Set up listeners once, outside your function
             ipcRenderer.on('delete-order-reply', (event, message) => {
@@ -980,6 +989,7 @@
                 });
             }
             processOrder(orderEntrySection);
+            onOperationComplete();
         }
     }
 

@@ -828,7 +828,6 @@ ipcMain.on('insert-order', (event, data) => {
             event.reply('insert-order-reply', 'Error inserting into Orders table.');
             return;
         }
-        console.log(`Row inserted`);
         event.reply('insert-order-reply', 'Successfully inserted into Orders table.');
     });
 });
@@ -847,7 +846,6 @@ ipcMain.on('insert-order-product', (event, data) => {
             event.reply('insert-order-product-reply', 'Error inserting into OrderProducts table.');
             return;
         }
-        console.log(`Row inserted`);
         event.reply('insert-order-product-reply', 'Successfully inserted into OrderProducts table.');
     });
 });

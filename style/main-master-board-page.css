@@ -195,7 +195,7 @@ body {
 .table-display {
     margin: 10px;
     /* width: auto; */
-    max-width: 1200px;
+    max-width: 1250px;
     height: 700px;
     overflow: auto;
 }
@@ -266,17 +266,21 @@ table tbody tr:hover {
 }
 
 /* Base style for all status buttons */
-.status-button {
+.status-button, .import-button {
     border: none;          /* Remove borders */
     border-radius: 15px;   /* Rounded edges */
-    padding: 5px 10px;     /* Padding for size and ensuring text is centered */
+    padding: 5px 5px;     /* Padding for size and ensuring text is centered */
     text-align: center;    /* Center the text */
     cursor: pointer;       /* Change cursor to pointer on hover */
     transition: background-color 0.3s; /* Optional: Smooth transition for hover effects */
-    width: 100px;          /* Set a fixed width */
+    width: 90px;          /* Set a fixed width */
     display: block;        /* Making it block to take the full width */
     margin: 0 auto;        /* Center the button if the table cell is larger */
     white-space: nowrap;   /* Prevents the text from wrapping to the next line */
+}
+
+.import-button {
+    width: 70px;
 }
 
 /* You can also add hover effects if you'd like */

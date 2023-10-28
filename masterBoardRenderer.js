@@ -139,6 +139,10 @@ async function createTable(data) {
         headerRow.appendChild(th);
     });
 
+    const quickBookHeader = document.createElement('th');
+    quickBookHeader.textContent = 'Quickbook';
+    headerRow.appendChild(quickBookHeader);
+
     const tableBody = table.createTBody();
 
     // Function to assign status based on date condition
@@ -246,8 +250,17 @@ async function createTable(data) {
                 if (key === productNames[i]) {
                   sales_summary[i] += item[key];
                 }
-            }
+            }        
             // ipcRenderer.removeListener('get-company-recent-products-success');
+        }
+        const quickBookCell = row.insertCell();
+        if (item['Status'] === 'Ordered') {
+            const importButton = document.createElement('button');
+            importButton.textContent = 'Import';
+            importButton.classList.add('import-button');  // Add this class to your CSS for styling
+            quickBookCell.appendChild(importButton);
+        } else {
+            quickBookCell.textContent = '';  // or any other content for non-Ordered statuses
         }
     }
 

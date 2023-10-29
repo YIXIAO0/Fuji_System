@@ -17,8 +17,8 @@
         }
     });
 
-    ipcRenderer.on('display-row-data', (event, displayData) => {
-        populateOrderEntryPage(displayData);
+    ipcRenderer.on('display-row-data', (event, displayData, processDate) => {
+        populateOrderEntryPage(displayData, processDate);
         currDisplayData = displayData;
     });
 
@@ -47,7 +47,7 @@
         container.insertBefore(button, container.firstChild);
     }
 
-    function populateOrderEntryPage(displayData) {
+    function populateOrderEntryPage(displayData, processDate) {
         // Populate the search input and trigger the event
         const searchInput = document.querySelector('.search-input'); // Adjust selector as needed
         if (searchInput) {
@@ -56,6 +56,45 @@
 
             // Set the search input to readonly
             searchInput.readOnly = true;
+        }
+        // Update date input
+        const dateInput = document.querySelector('#date-input');
+        let dayOfWeekSpan = document.querySelector(`#day-of-week${orderEntryCount}`);
+
+        if (dateInput && processDate) {
+            let orderDate = processDate;
+            let dateString = '';
+            if (orderDate instanceof Date) {
+                // Format Date object to "yyyy-MM-dd"
+                dateString = orderDate.toISOString().split('T')[0];
+            } else if (typeof orderDate === 'object' && orderDate.year && orderDate.month && orderDate.day) {
+                // Format object with year, month, day to "yyyy-MM-dd"
+                dateString = `${orderDate.year}-${String(orderDate.month).padStart(2, '0')}-${String(orderDate.day).padStart(2, '0')}`;
+            } else if (typeof orderDate === 'string') {
+                // If it's an ISO string with a timestamp, extract only the date part
+                if (orderDate.includes('T')) {
+                    dateString = orderDate.split('T')[0];
+                } else {
+                    // Use the string directly if it's already in the correct format
+                    dateString = orderDate;
+                }
+            }
+
+            if (dateString) {
+                dateInput.value = dateString;
+                if (!dayOfWeekSpan) {
+                    // Create dayOfWeekSpan if it does not exist
+                    dayOfWeekSpan = document.createElement('span');
+                    dayOfWeekSpan.id = `day-of-week${dateString}`;
+                    dateInput.parentNode.appendChild(dayOfWeekSpan);
+                }
+    
+                const [year, month, day] = dateString.split('-').map(part => parseInt(part, 10));
+                const selectedDate = new Date(year, month - 1, day);
+                const options = { weekday: 'long' };
+                // clear the original content
+                dayOfWeekSpan.textContent = " (" + selectedDate.toLocaleDateString(undefined, options) + ")";
+            }
         }
     }
 

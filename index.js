@@ -124,14 +124,14 @@ ipcMain.on('open-customer-details', (event, customerData) => {
     mainWindow.loadFile('customerDetails.html');
 });
 
-ipcMain.on('open-display-row', (event, data) => {
+ipcMain.on('open-display-row', (event, data, processDate) => {
     mainWindow.webContents.once('did-fail-load', (event, errorCode, errorDescription) => {
         console.error("Failed to load:", errorCode, errorDescription);
     });
     
     mainWindow.webContents.once('did-finish-load', () => {
         // Once the file is loaded, send the product data to the renderer
-        mainWindow.webContents.send('display-row-data', data);
+        mainWindow.webContents.send('display-row-data', data, processDate);
     });
 
     mainWindow.loadFile('orderEntryPage.html');

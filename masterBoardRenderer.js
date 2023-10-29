@@ -136,7 +136,6 @@ dateInput.addEventListener('change', function(event) {
   dayOfWeek = (selectedDate.getDay() + 1)%7;
   selectedDate = formatDate(selectedDate);
   processDate = selectedDate;
-  console.log(processDate);
   getOrderFromDate (selectedDate, dayOfWeek);
   // ipcRenderer.send('get-order-from-date', selectedDate, dayOfWeek);
   // You can perform other operations with the selectedDate variable here
@@ -312,7 +311,7 @@ document.addEventListener('click', (event) => {
             // Extract the product data from the row's data-product attribute
             const displayData = JSON.parse(row.getAttribute('data-display-row'));
             // Sending the product data to the main process to open the product details page
-            ipcRenderer.send('open-display-row', displayData);
+            ipcRenderer.send('open-display-row', displayData, processDate);
         }
     } else if (event.target.closest('td.modify-order-row')){
         let row = event.target.closest('td.modify-order-row');

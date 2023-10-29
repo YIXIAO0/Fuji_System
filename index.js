@@ -769,6 +769,7 @@ ipcMain.on('get-order-from-date', async (event, data1, data2) => {
         c.customerName AS Company,
         c.customerID AS CompanyID,
         o.orderID AS OrderID,
+        o.orderDate AS OrderDate,
         o.orderIsReturn AS Type,
         o.orderPO AS 'PO#',
         MAX(CASE WHEN p.productName = '1.25oz Chips' THEN op.productQuantity END) AS '1.25oz Chips',

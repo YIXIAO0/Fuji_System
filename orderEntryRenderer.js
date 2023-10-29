@@ -492,15 +492,15 @@
 
             table.appendChild(tbody);
             orderEntrySection.appendChild(table);
-            setupEventListener(orderEntrySection);
+            setupEventListener(orderEntrySection, orderEntryCount);
         });
 
-        function setupEventListener(orderEntrySection) {
+        function setupEventListener(orderEntrySection, orderEntryCount) {
             ipcRenderer.on('display-modify-row-data', (event, displayData) => {
                 populateOrderEntryPage(displayData);
                 currDisplayData = displayData;
                 updateInputValues(orderEntrySection);
-                updateChannelAndTypeSelections(orderEntrySection);
+                updateChannelAndTypeSelections(orderEntrySection, orderEntryCount);
                 updateSales();
                 currUpdateData = true;
             });
@@ -546,7 +546,7 @@
         });
     }
 
-    function updateChannelAndTypeSelections(orderEntrySection) {
+    function updateChannelAndTypeSelections(orderEntrySection, orderEntryCount) {
         if (!currDisplayData) return;
     
         const channelButtons = orderEntrySection.querySelectorAll('#channelSelectionDiv .channel-button');
@@ -576,6 +576,46 @@
                 }
             }
         });
+        // Update date input
+        const dateInput = orderEntrySection.querySelector('#date-input');
+        let dayOfWeekSpan = orderEntrySection.querySelector(`#day-of-week${orderEntryCount}`);
+
+        if (dateInput && currDisplayData) {
+            let orderDate = currDisplayData.OrderDate;
+            let dateString = '';
+
+            if (orderDate instanceof Date) {
+                // Format Date object to "yyyy-MM-dd"
+                dateString = orderDate.toISOString().split('T')[0];
+            } else if (typeof orderDate === 'object' && orderDate.year && orderDate.month && orderDate.day) {
+                // Format object with year, month, day to "yyyy-MM-dd"
+                dateString = `${orderDate.year}-${String(orderDate.month).padStart(2, '0')}-${String(orderDate.day).padStart(2, '0')}`;
+            } else if (typeof orderDate === 'string') {
+                // If it's an ISO string with a timestamp, extract only the date part
+                if (orderDate.includes('T')) {
+                    dateString = orderDate.split('T')[0];
+                } else {
+                    // Use the string directly if it's already in the correct format
+                    dateString = orderDate;
+                }
+            }
+
+            if (dateString) {
+                dateInput.value = dateString;
+                if (!dayOfWeekSpan) {
+                    // Create dayOfWeekSpan if it does not exist
+                    dayOfWeekSpan = document.createElement('span');
+                    dayOfWeekSpan.id = `day-of-week${dateString}`;
+                    dateInput.parentNode.appendChild(dayOfWeekSpan);
+                }
+    
+                const [year, month, day] = dateString.split('-').map(part => parseInt(part, 10));
+                const selectedDate = new Date(year, month - 1, day);
+                const options = { weekday: 'long' };
+                // clear the original content
+                dayOfWeekSpan.textContent = " (" + selectedDate.toLocaleDateString(undefined, options) + ")";
+            }
+        }
     }
 
     function displayResults(customers, count, searchInput, resultsContainer, searchBar) {

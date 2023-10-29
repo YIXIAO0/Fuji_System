@@ -149,7 +149,7 @@ async function createTable(data) {
     const headerRow = tableHeader.insertRow();
 
     Object.keys(data[0]).forEach((key) => {
-        if (key === 'CompanyID' || key === 'OrderID'){
+        if (key === 'CompanyID' || key === 'OrderID' || key === 'OrderDate'){
             return;
         }
         const th = document.createElement('th');
@@ -203,7 +203,7 @@ async function createTable(data) {
         // row.classList.add('display-table-row');
         // row.setAttribute('data-display-row',JSON.stringify(item));
         for (const key in item) {
-            if (key === 'CompanyID' || key === 'OrderID'){
+            if (key === 'CompanyID' || key === 'OrderID' || key === 'OrderDate'){
                 continue;
             }
             const cell = row.insertCell();

@@ -84,6 +84,12 @@ function fillSummaryTable() {
   totalHeader.textContent = 'Sales Total';
   headerRow.appendChild(totalHeader);
 
+  const headerButtonCell = document.createElement('td');
+  const headerButton = document.createElement('button');
+  headerButton.textContent = 'Download'; // Text for button in data row
+  headerButton.classList.add('action-button'); // Assign class to button
+  headerButtonCell.appendChild(headerButton);
+  headerRow.appendChild(headerButtonCell);
   summaryTable.appendChild(headerRow);
 
   const additionalRow = document.createElement('tr');
@@ -92,6 +98,11 @@ function fillSummaryTable() {
   cell.setAttribute('colspan', '7'); // Assuming there are 7 columns in total
   cell.textContent = `Day's Summary`; // You can assign the value you want here
   additionalRow.appendChild(cell);
+
+  const actionCell = document.createElement('td'); // Create a new cell
+  actionCell.textContent = 'Action'; // Set the cell text
+  additionalRow.appendChild(actionCell); // Add the new cell to the row
+
   summaryTable.insertBefore(additionalRow, summaryTable.firstChild);
 
   // Create the table data row
@@ -108,6 +119,13 @@ function fillSummaryTable() {
   const totalCell = document.createElement('td');
   totalCell.textContent = sales_summary[6].toFixed(2);; // Total
   dataRow.appendChild(totalCell);
+
+  const dataButtonCell = document.createElement('td');
+  const dataButton = document.createElement('button');
+  dataButton.textContent = 'Print'; // Text for button in data row
+  dataButton.classList.add('action-button'); // Assign class to button
+  dataButtonCell.appendChild(dataButton);
+  dataRow.appendChild(dataButtonCell);
 
   summaryTable.appendChild(dataRow);
 }
@@ -310,17 +328,29 @@ function handleButtonClick(event) {
     const company = event.target.getAttribute('data-company');
     const processDateObj = new Date(processDate);
 
-    const isConfirmed = confirm('Are you sure you want to change status?');
-    if (isConfirmed) {
-        if (event.target.textContent === 'Must Check' || event.target.textContent === 'Waiting') {
+    // const isConfirmed = confirm('Are you sure you want to change status?');
+    // if (isConfirmed) {
+    //     if (event.target.textContent === 'Must Check' || event.target.textContent === 'Waiting') {
+    //         event.target.textContent = 'No Order';
+    //         event.target.className = 'status-button no-order';
+    //         changedRows.push({ processDate: processDateObj, company: company });
+    //         store.set('changedRows', changedRows);
+    //     }
+    // }
+    if (event.target.textContent === 'Must Check' || event.target.textContent === 'Waiting') {
+        const isConfirmed = confirm('Are you sure you want to change status?');
+        if (isConfirmed) {
             event.target.textContent = 'No Order';
             event.target.className = 'status-button no-order';
             changedRows.push({ processDate: processDateObj, company: company });
             store.set('changedRows', changedRows);
+
+            sales_summary = [0,0,0,0,0,0,0];
+            createTable(sqldata);
         }
     }
-    sales_summary = [0,0,0,0,0,0,0];
-    createTable(sqldata);
+    // sales_summary = [0,0,0,0,0,0,0];
+    // createTable(sqldata);
 }
 
 

@@ -785,7 +785,7 @@ ipcMain.on('get-order-from-date', async (event, data1, data2) => {
     LEFT JOIN OrderProducts op ON o.orderID = op.orderID
     LEFT JOIN Products p ON op.productID = p.productID
     WHERE 
-        SUBSTRING(customerSchedule, ${orderDayOfWeek + 1}, 1) = '1' or o.orderDate = '${orderDate}'
+        (SUBSTRING(customerSchedule, ${orderDayOfWeek + 1}, 1) = '1' or o.orderDate = '${orderDate}') AND customerIsActive = 1
     GROUP BY 
         c.customerName,
         c.customerID,

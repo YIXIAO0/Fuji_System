@@ -266,7 +266,7 @@ table tbody tr:hover {
 }
 
 /* Base style for all status buttons */
-.status-button, .import-button {
+.status-button, .import-button, .action-button {
     border: none;          /* Remove borders */
     border-radius: 15px;   /* Rounded edges */
     padding: 5px 5px;     /* Padding for size and ensuring text is centered */
@@ -280,8 +280,14 @@ table tbody tr:hover {
 }
 
 .import-button {
+    background-color: #e0ffe0;
     width: 70px;
 }
+
+.action-button {
+    background-color: #fde19e;
+}
+
 
 /* You can also add hover effects if you'd like */
 .status-button:hover {

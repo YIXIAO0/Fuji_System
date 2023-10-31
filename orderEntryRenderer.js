@@ -1093,7 +1093,7 @@
                 });
             }
             processOrder(orderEntrySection);
-            onOperationComplete();
+            // onOperationComplete();
         }
     }
 

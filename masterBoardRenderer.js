@@ -420,7 +420,6 @@ document.addEventListener('DOMContentLoaded', function () {
     buttons.forEach(button => {
         button.addEventListener('click', function () {
             // Remove 'active' class from all buttons
-            console.log(buttons);
             buttons.forEach(innerButton => {
                 innerButton.classList.remove('active');
             });

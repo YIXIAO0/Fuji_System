@@ -816,7 +816,9 @@ ipcMain.on('get-order-from-date', async (event, data1, data2) => {
 });
 
 ipcMain.on('insert-order', (event, data) => {
-    
+    // console.log("Insert Order");
+    // console.log(data);
+    // console.log("--------------------");
     const { orderID, invoiceID, customerID, orderDate, orderTotal, orderIsReturn, orderChannel, orderStatus, orderPO } = data;
     const query = `
         INSERT INTO Orders (orderID, invoiceID, customerID, orderDate, orderTotal, orderIsReturn, orderChannel, orderStatus, orderPO) 
@@ -834,7 +836,9 @@ ipcMain.on('insert-order', (event, data) => {
 });
 
 ipcMain.on('insert-order-product', (event, data) => {
-    
+    // console.log("Insert Order Product");
+    // console.log(data);
+    // console.log("--------------------");
     const { orderID, productID, productQuantity } = data;
     const query = `
         INSERT INTO OrderProducts (orderID, productID, productQuantity) 

@@ -116,7 +116,8 @@ ipcRenderer.on('get-contacts-for-company-success', (event, rows) => {
         const tr_note = document.createElement('tr');
         const td_note = document.createElement('td');
         td_note.colSpan = 3;
-        td_note.textContent = "Note: " + row.contactNotes;
+        td_note.textContent = row.contactNotes;
+        td_note.style.fontWeight = 'normal';
         tr_note.appendChild(td_note);
         tbody.appendChild(tr_note);
     });

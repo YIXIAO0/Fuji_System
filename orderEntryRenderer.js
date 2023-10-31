@@ -1027,20 +1027,32 @@
                 // Handle insert order product response
             });
 
-            function processOrder(orderEntrySection) {
+            async function processOrder(orderEntrySection) {
                 const selectedValues = getSelectedValues(orderEntrySection);
                 let orderID = currDisplayData['OrderID'];
-
+            
                 // Step 1: Delete existing order
-                ipcRenderer.once('delete-order-reply', (event, message) => {
-                    console.log(message);
-                    // Proceed with insertion only after successful deletion
-                    insertNewOrder(orderID, selectedValues);
-                });
-                ipcRenderer.send('delete-order', orderID);
-            }
+                await deleteOrder(orderID);
+                // Proceed with insertion after deletion
+                await insertNewOrder(orderID, selectedValues);
 
-            function insertNewOrder(orderID, selectedValues) {
+                // Step 3: Notify completion
+                onOperationComplete();
+            }
+            
+            function deleteOrder(orderID) {
+                return new Promise((resolve, reject) => {
+                    ipcRenderer.send('delete-order', orderID);
+                    ipcRenderer.once('delete-order-reply', (event, message) => {
+                        console.log(message);
+                        // You can use message to decide whether to resolve or reject
+                        // For this example, we'll resolve on any message
+                        resolve(message);
+                    });
+                });
+            }
+            
+            async function insertNewOrder(orderID, selectedValues) {
                 const orderData = {
                     orderID: orderID,
                     invoiceID: orderID + 34000,
@@ -1053,18 +1065,31 @@
                     orderPO: selectedValues.poNumber
                 }
 
-                ipcRenderer.send('insert-order', orderData);
+                // Insert the order and wait for completion
+                await new Promise((resolve, reject) => {
+                    ipcRenderer.send('insert-order', orderData);
+                    ipcRenderer.once('insert-order-reply', (event, message) => {
+                        console.log("Insert Order Reply:", message);
+                        resolve();
+                    });
+                });
 
-                selectedValues.productInfo.forEach((product, index) => {
+                selectedValues.productInfo.forEach(async (product, index) => {
                     if (product.quantity === 0){
                         return;
                     }
-                    const orderProductData = {
-                        orderID: orderID,
-                        productID: index + 1,
-                        productQuantity: product.quantity
-                    };
-                    ipcRenderer.send('insert-order-product', orderProductData);
+                    await new Promise((resolve, reject) => {
+                        const orderProductData = {
+                            orderID: orderID,
+                            productID: index + 1,
+                            productQuantity: product.quantity
+                        };
+                        ipcRenderer.send('insert-order-product', orderProductData);
+                        ipcRenderer.once('insert-order-product-reply', (event, message) => {
+                            console.log("Insert Order Product Reply:", message);
+                            resolve();
+                        });
+                    });
                 });
             }
             processOrder(orderEntrySection);
